@@ -38,3 +38,40 @@
   
 - Joueur2
   - ↑ ↓ → ← + L
+
+
+## Architecture
+- Assets
+  - Prefabs  
+    - Bombes
+    - Fire
+    - Walls
+      - UnbreakableWalls
+      - BreakablesWalls
+    Bonus
+      - UpBomb
+      - UpRange
+      - MegaBomb
+  - Scenes
+    - menu
+    - map1 
+  - Scripts
+    - Bombes
+      - snapBombes
+      - explodeBombes
+      - bombesSettings
+    - Player
+      - mouvements
+      - health
+      - dropBomb
+    - GameManager
+      - time
+      - score
+      - gameSettings
+    - Map
+      - generateGrid
+      - generateRandomBreakableWall
+      - generateBonuses
+      - suddenDeath
+    -Utils
+  - Sprites
