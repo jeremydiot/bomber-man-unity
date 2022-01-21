@@ -34,10 +34,10 @@
   
 ## Touches
 - Joueur1
-  - Z Q S D + G
+  - Z Q S D + Space
   
 - Joueur2
-  - ↑ ↓ → ← + L
+  - ↑ ↓ → ← + Enter
 
 
 ## Architecture

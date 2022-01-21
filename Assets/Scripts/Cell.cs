@@ -3,64 +3,73 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-public class Cell : MonoBehaviour
+public class Cell
 {
-    private static string[] forbiddenPositions = new string[12]{
-        "1,11","2,11","1,10","15,1","14,1","15,2","15,11","14,11","15,10","1,1","1,2","2,1"
-    };
 
-    private bool isLock = false;
-    private GameObject gameObject;
-    private int col;
-    private int line;
-
-    public Cell(int col ,int line,bool isLock=false, GameObject gameObject=null)
-    {
-        foreach (string pos in forbiddenPositions)
+    public static int[][] ForbiddenDrawPositions = new int[][]
         {
-            if (col + "," + line == pos)
+            new int[] { 1, 11 },
+            new int[] { 2, 11 },
+            new int[] { 1, 10 },
+            new int[] { 15, 1 },
+            new int[] { 14, 1 },
+            new int[] { 15, 2 },
+            new int[] { 15, 11 },
+            new int[] { 14, 11 },
+            new int[] { 15, 10 },
+            new int[] { 1, 1 },
+            new int[] { 1, 2 },
+            new int[] { 2, 1 },
+        };
+
+    private GameObject gameObject = null;
+    private int col = -1;
+    private int row = -1;
+    private bool breakable = true;
+    private bool isForbiddenDrawPositions = false;
+
+    public Cell(int col, int row, GameObject gameObject){
+        this.gameObject = gameObject;
+        this.row = row;
+        this.col = col;
+    }
+
+    public Cell(int col, int row){
+        this.row = row;
+        this.col = col;
+    }
+
+    public void Draw(bool force = false)
+    {
+
+        if (!force)
+        {
+            foreach (int[] position in ForbiddenDrawPositions)
             {
-                this.isLock = true;
-                break;
+                if (this.col == position[0] && this.row == position[1]) return;
             }
         }
 
-        this.col = col;
-        this.line = line;
-        this.isLock = isLock;
-        this.gameObject = gameObject;
+        if (this.gameObject != null) MonoBehaviour.Instantiate(this.gameObject, new Vector3((float)col, (float)row), this.gameObject.transform.rotation);
     }
 
-    public void setIsLock(bool isLock)
-    {
-        this.isLock = isLock;
-    }
-    
-    public void setGameObject(GameObject gameObject)
+    public void SetGameObject(GameObject gameObject)
     {
         this.gameObject = gameObject;
     }
 
-    public bool getIsLock()
-    {
-        return this.isLock;
-    }
-
-    public GameObject getGameObject()
+    public GameObject GetGameObject()
     {
         return this.gameObject;
     }
 
-    public void instanciateGameObject()
+    public void SetBreakable(bool breakable)
     {
-        if (!this.isLock)
-        {
-            Instantiate(this.gameObject, new Vector3((float) col, (float) line), Quaternion.identity);
-        }
+        this.breakable = breakable;
     }
 
-    public void destroyGameObject()
+    public bool IsBreakable()
     {
-        Destroy(this.gameObject);
+        return this.breakable;
     }
 }
