@@ -136,6 +136,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 989223a7c0b7e3648b2bb28b48092e43, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefabCanvas: {fileID: 3702869500689511033, guid: 9246eccd10d194b42ba07a2330cfb729, type: 3}
 --- !u!114 &-5289031122412718624
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -148,6 +149,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f367e9503d5b28d49a312bb09782439f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  prefabCanvas: {fileID: 4609269768156278372, guid: 82dd50bccb9118f4c841bb946a548f48, type: 3}
 --- !u!114 &4556159893511018138
 MonoBehaviour:
   m_ObjectHideFlags: 0

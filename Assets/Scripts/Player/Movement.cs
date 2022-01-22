@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+
 
 public class Movement : MonoBehaviour
 {
@@ -11,6 +13,12 @@ public class Movement : MonoBehaviour
     private float speed = 10;
     private bool canMove = true;
 
+    public Canvas prefabCanvas;
+    private Canvas instanciateCanvas;
+
+    private TextMeshProUGUI TMPPlayerNum;
+    
+
     private void Awake()
     {
         
@@ -20,7 +28,13 @@ public class Movement : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        keyboard = player.keyboard;
+        keyboard = player.GetKeyboard();
+        instanciateCanvas = Instantiate(prefabCanvas);
+        TMPPlayerNum = instanciateCanvas.transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        TMPPlayerNum.text = player.GetNumber().ToString();
+        //player.GetCanvas().transform.GetChild(0).gameObject.SetActive(false);
+        //TMPPlayerNum =  player.GetCanvas().transform.GetChild(0).GetComponent<TextMeshProUGUI>();
+        //TextMeshProUGUI text =  Instantiate(TMPPlayerNum);
     }
 
     // Update is called once per frame
@@ -38,8 +52,19 @@ public class Movement : MonoBehaviour
         if (Input.GetKey(keyboard[0]) && Input.GetKey(keyboard[2])) y = 0;
         if (Input.GetKey(keyboard[1]) && Input.GetKey(keyboard[3])) x = 0;
 
-        if (canMove) transform.Translate(new Vector3(x, y) * speed * Time.deltaTime);
+        TMPPlayerNum.gameObject.transform.position = gameObject.transform.position;
+
+        if (canMove){
+            transform.Translate(new Vector3(x, y) * speed * Time.deltaTime);
+        }
 
     }
 
+
+    private void OnDestroy()
+    {
+
+        Destroy(TMPPlayerNum);
+        
+    }
 }

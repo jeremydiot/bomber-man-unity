@@ -5,7 +5,7 @@ using UnityEngine;
 public class Player
 {
 
-    public string[] keyboard;
+    private string[] keyboard;
     private int number;
     private int health;
     private GameObject instanciateGameObject = null;
@@ -30,19 +30,17 @@ public class Player
 
     public int DownHealth(int i = 1){
         this.health = this.health - i;
+        if (this.health < 0) this.health = 0;
         return this.health;
     }
 
-    public int UpHealth(int i = 1)
-    {
+    public int UpHealth(int i = 1){
         this.health = this.health + i;
         return this.health;
     }
 
-    public void Draw(GameObject gameObject, int posX, int posY)
-    {
-        if (this.instanciateGameObject == null)
-        {
+    public void Draw(GameObject gameObject, int posX, int posY){
+        if (this.instanciateGameObject == null){
             this.instanciateGameObject = MonoBehaviour.Instantiate(gameObject, new Vector3((float)posX, (float)posY), gameObject.transform.rotation);
             this.instanciateGameObject.GetComponent<Movement>().player = this;
             this.instanciateGameObject.GetComponent<Shoot>().player = this;
@@ -50,8 +48,7 @@ public class Player
         }
     }
 
-    public void Erase(float delay = 0f)
-    {
+    public void Erase(float delay = 0f){
         MonoBehaviour.Destroy(this.instanciateGameObject, delay);
         this.instanciateGameObject = null;
     }
