@@ -5,51 +5,78 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+
+    private static int playerNumber = 2;
+    private static int colNum = 17;
+    private static int rowNum = 13;
+
     public static int[][] SpawnPositions = new int[][]
     {
-            new int[] { 1, 1 },
-            new int[] { 1, 11 },
-            new int[] { 15, 11 },
-            new int[] { 15, 1 },
+        new int[] { 1, 1 },
+        new int[] { 1, rowNum - 2},
+        new int[] { colNum - 2, 1 },
+        new int[] { colNum - 2, rowNum - 2 },
             
     };
+    public static int[][] ForbiddenDrawPositions = new int[][]
+    {
+        new int[] { 1, 2 },
+        new int[] { 1, 1 },
+        new int[] { 2, 1 },
 
-    public GameObject groundGameObject;
-    public GameObject UnbreakableGameObject;
-    public GameObject BreakableGameObject;
-    public GameObject PlayerGameObject;
+        new int[] { 1, rowNum - 3 },
+        new int[] { 1, rowNum - 2 },
+        new int[] { 2, rowNum - 2 },
 
-    private List<List<Cell>> groundCells = new List<List<Cell>>();
-    private List<List<Cell>> mapCells = new List<List<Cell>>();
-    private List<GameObject> instantiatePlayerGameObjects = new List<GameObject>();
+        new int[] { colNum - 3, rowNum - 2 },
+        new int[] { colNum - 2, rowNum - 2 },
+        new int[] { colNum - 2, rowNum - 3 },
+
+        new int[] { colNum - 2, 2},
+        new int[] { colNum - 2, 1 },
+        new int[] { colNum - 3, 1 },
+    };
+    public static string[][] playerKeyboard = new string[][]
+    {
+        new string[]{"z", "q", "s", "d", "space"},
+        new string[]{"up", "left", "down", "right", "return"}
+    };
 
 
-    private int colNum = 16;
-    private int rowNum = 12;
+
+    public GameObject groundPrefab;
+    public GameObject UnbreakableWallPrefab;
+    public GameObject BreakableWallPrefab;
+    public GameObject PlayerPrefab;
+
+    private Cell[][] groundCellsLayer = new Cell[rowNum][];
+    public Cell[][] mapCellsLayer = new Cell[rowNum][];
+
+    private Player[] players = new Player[playerNumber];
 
     private void Awake(){
         Instance = this;
 
-        //empty ground and map cells
-        for (int r = 0; r <= rowNum; r++)
+        //init cells layers
+        for (int r = 0; r < rowNum; r++)
         {
-            groundCells.Add(new List<Cell>());
-            mapCells.Add(new List<Cell>());
+            groundCellsLayer[r] = new Cell[colNum];
+            mapCellsLayer[r] = new Cell[colNum];
 
-            for (int c = 0; c <= colNum; c++)
+            for (int c = 0; c < colNum; c++)
             {
-                groundCells[r].Add(new Cell(c,r));
-                mapCells[r].Add(new Cell(c,r));
+                groundCellsLayer[r][c]=new Cell(c, r, canErase:false);
+                mapCellsLayer[r][c]=new Cell(c, r, ForbiddenDrawPositions);
             }
         }
-
     }
+
     // Start is called before the first frame update
     void Start(){
         DrawGroundCells();
         DrawUnbreakableGameCells();
         DrawBreakableGameCells();
-        SpawnPlayer(2);
+        SpawnPlayer(playerNumber);
     }
 
     // Update is called once per frame
@@ -58,90 +85,73 @@ public class GameManager : MonoBehaviour
     }
 
     private void DrawGroundCells(){
-        for (int r = 0; r <= rowNum; r++)
+        for (int r = 0; r < rowNum; r++)
         {
-            for (int c = 0; c <= colNum; c++)
+            for (int c = 0; c < colNum; c++)
             {
-                Cell cell = groundCells[r][c];
-                cell.SetGameObject(groundGameObject);
-                cell.SetBreakable(false);
-                cell.Draw(true);
+                Cell cell = groundCellsLayer[r][c];
+                cell.Draw(groundPrefab);
             }
         }
     }
 
     private void DrawUnbreakableGameCells()
     {
-        for (int r = 0; r <= rowNum; r++)
+        for (int r = 0; r < rowNum; r++)
         {
-            for (int c = 0; c <= colNum; c++)
+            for (int c = 0; c < colNum; c++)
             {
 
-                Cell cell = mapCells[r][c];
+                Cell cell = mapCellsLayer[r][c];
 
-                if (r == rowNum || r == 0 || c == colNum || c == 0)
+                if (r == 0 || c == 0 || r == rowNum-1 || c == colNum-1 || (r % 2 == 0 && c % 2 == 0))
                 {
-                    cell.SetGameObject(UnbreakableGameObject);
-                    cell.SetBreakable(false);
-                    cell.Draw();
-
-                }
-                else if (r % 2 == 0 && c % 2 == 0)
-                {
-
-                    cell.SetGameObject(UnbreakableGameObject);
-                    cell.SetBreakable(false);
-                    cell.Draw();
+                    cell.Draw(UnbreakableWallPrefab);
+                    cell.SetErasable(false);
                 }
             }
         }
     }
-
+    
     private void DrawBreakableGameCells()
     {
 
-        for (int r = 0; r <= rowNum; r++)
+        for (int r = 0; r < rowNum; r++)
         {
-            for (int c = 0; c <= colNum; c++)
+            for (int c = 0; c < colNum; c++)
             {
+                Cell cell = mapCellsLayer[r][c];
 
-                Cell cell = mapCells[r][c];
-
-                if (cell.GetGameObject() == null)
+                if (cell.GetInstanciateGameObject() == null)
                 {
                     if (Random.Range(0, 2) == 1)
                     {
-                        cell.SetGameObject(BreakableGameObject);
-                        cell.SetBreakable(true);
-                        cell.Draw();
+                        cell.Draw(BreakableWallPrefab);
                     }
                 }
 
             }
         }
     }
+    private void SpawnPlayer(int num = 1)
+    {
 
-    private void SpawnPlayer(int num = 1){
         int positionPlayerOne = Random.Range(0, 4);
-        int positionPlayerTwo = 1;
+        Player playerOne = new Player(1, playerKeyboard[0], 10);
 
-        if (positionPlayerOne == 0) positionPlayerTwo = 2;
-        else if (positionPlayerOne == 1) positionPlayerTwo = 3;
-        else if (positionPlayerOne == 2) positionPlayerTwo = 0;
+        int positionPlayerTwo = Random.Range(2, 4);
+        Player playerTwo = new Player(2, playerKeyboard[1], 10);
 
-        GameObject instantiateGameObjectPlayerOne =  Instantiate(PlayerGameObject, new Vector3((float)SpawnPositions[positionPlayerOne][0], (float)SpawnPositions[positionPlayerOne][1]), PlayerGameObject.transform.rotation);
-        instantiateGameObjectPlayerOne.GetComponent<Movement>().playerNum=1;
-        instantiateGameObjectPlayerOne.GetComponent<Shoot>().playerNum=1;
-        instantiatePlayerGameObjects.Add(instantiateGameObjectPlayerOne);
-
-        if (num > 1)
+        if (num == 2)
         {
-            GameObject instantiateGameObjectPlayerTwo = Instantiate(PlayerGameObject, new Vector3((float)SpawnPositions[positionPlayerTwo][0], (float)SpawnPositions[positionPlayerTwo][1]), PlayerGameObject.transform.rotation);
-            instantiateGameObjectPlayerTwo.GetComponent<Movement>().playerNum = 2;
-            instantiateGameObjectPlayerTwo.GetComponent<Shoot>().playerNum = 2;
-            instantiatePlayerGameObjects.Add(instantiateGameObjectPlayerTwo);
+            positionPlayerOne = Random.Range(0, 2);
 
+            players[1] = playerTwo;
+            playerTwo.Draw(PlayerPrefab, SpawnPositions[positionPlayerTwo][0], SpawnPositions[positionPlayerTwo][1]);
         }
+
+        players[0] = playerOne;
+        playerOne.Draw(PlayerPrefab, SpawnPositions[positionPlayerOne][0], SpawnPositions[positionPlayerOne][1]);
 
     }
 }

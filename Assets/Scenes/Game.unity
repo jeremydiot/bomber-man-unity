@@ -206,6 +206,72 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1078182744
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1078182747}
+  - component: {fileID: 1078182746}
+  - component: {fileID: 1078182745}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1078182745
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1078182744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
+--- !u!114 &1078182746
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1078182744}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+--- !u!4 &1078182747
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1078182744}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1769159935
 GameObject:
   m_ObjectHideFlags: 0
@@ -235,10 +301,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a23081784469034c9c485db33f41a9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  groundGameObject: {fileID: 2806322863678104050, guid: 6335f72fcc4b8a69c8e6be9d737d24eb, type: 3}
-  UnbreakableGameObject: {fileID: 3651106973004565208, guid: 4c3ad8188d577d4fb891892a291ce505, type: 3}
-  BreakableGameObject: {fileID: 2301321693982930836, guid: 8dd34e658316ddec38736276e9b6b1d6, type: 3}
-  PlayerGameObject: {fileID: 1862953621194357156, guid: 3b07e91e8f971c55c84041d23a5588c0, type: 3}
+  groundPrefab: {fileID: 2806322863678104050, guid: 6335f72fcc4b8a69c8e6be9d737d24eb, type: 3}
+  UnbreakableWallPrefab: {fileID: 3651106973004565208, guid: 4c3ad8188d577d4fb891892a291ce505, type: 3}
+  BreakableWallPrefab: {fileID: 2301321693982930836, guid: 8dd34e658316ddec38736276e9b6b1d6, type: 3}
+  PlayerPrefab: {fileID: 4981843931203932096, guid: 3b07e91e8f971c55c84041d23a5588c0, type: 3}
 --- !u!4 &1769159937
 Transform:
   m_ObjectHideFlags: 0

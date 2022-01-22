@@ -6,70 +6,56 @@ using UnityEngine;
 public class Cell
 {
 
-    public static int[][] ForbiddenDrawPositions = new int[][]
-        {
-            new int[] { 1, 11 },
-            new int[] { 2, 11 },
-            new int[] { 1, 10 },
-            new int[] { 15, 1 },
-            new int[] { 14, 1 },
-            new int[] { 15, 2 },
-            new int[] { 15, 11 },
-            new int[] { 14, 11 },
-            new int[] { 15, 10 },
-            new int[] { 1, 1 },
-            new int[] { 1, 2 },
-            new int[] { 2, 1 },
-        };
-
-    private GameObject gameObject = null;
+    private GameObject instanciateGameObject = null;
     private int col = -1;
     private int row = -1;
-    private bool breakable = true;
-    private bool isForbiddenDrawPositions = false;
+    private bool canErase = true;
+    private bool canDraw = true;
 
-    public Cell(int col, int row, GameObject gameObject){
-        this.gameObject = gameObject;
-        this.row = row;
-        this.col = col;
-    }
-
-    public Cell(int col, int row){
-        this.row = row;
-        this.col = col;
-    }
-
-    public void Draw(bool force = false)
+    public Cell(int col, int row, int[][] forbiddenDrawPositions = null, bool canErase = true )
     {
+        this.row = row;
+        this.col = col;
+        this.canErase = canErase;
 
-        if (!force)
+        if (forbiddenDrawPositions != null)
         {
-            foreach (int[] position in ForbiddenDrawPositions)
+            foreach (int[] position in forbiddenDrawPositions)
             {
-                if (this.col == position[0] && this.row == position[1]) return;
+                if (this.col == position[0] && this.row == position[1]) canDraw = false;
             }
         }
-
-        if (this.gameObject != null) MonoBehaviour.Instantiate(this.gameObject, new Vector3((float)col, (float)row), this.gameObject.transform.rotation);
     }
 
-    public void SetGameObject(GameObject gameObject)
+
+    public void Draw(GameObject gameObject, bool force = false)
     {
-        this.gameObject = gameObject;
+        if (this.instanciateGameObject == null && (force || canDraw))
+        {
+            this.instanciateGameObject = MonoBehaviour.Instantiate(gameObject, new Vector3((float)col, (float)row), gameObject.transform.rotation);
+        }
     }
 
-    public GameObject GetGameObject()
+    public void Erase(float delay = 0f, bool force = false){
+
+        if (this.IsErasable()||force){
+            MonoBehaviour.Destroy(this.instanciateGameObject, delay);
+            this.instanciateGameObject = null;
+            this.SetErasable(true);
+        }
+    }
+    public void SetErasable(bool canErase)
     {
-        return this.gameObject;
+        this.canErase = canErase;
     }
 
-    public void SetBreakable(bool breakable)
+    public bool IsErasable()
     {
-        this.breakable = breakable;
+        return this.canErase;
+    }
+    
+    public GameObject GetInstanciateGameObject(){
+        return this.instanciateGameObject;
     }
 
-    public bool IsBreakable()
-    {
-        return this.breakable;
-    }
 }
