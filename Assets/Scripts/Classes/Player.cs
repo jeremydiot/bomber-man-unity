@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading.Tasks;
 
 public class Player
 {
@@ -13,11 +14,66 @@ public class Player
     private Player enemy = null;
     private bool dead = false;
     private bool canMove = true;
+    private bool canShoot = true;
+    private int maxBomb = 1;
+    private int maxImpact = 1;
+    private int availableBomb = 0;
 
     public Player(int number, string[] keyboard)
     {
         this.number = number;
         this.keyboard = keyboard;
+    }
+
+    public void infiniteImpact(float delay = 5f)
+    {
+        // TODO delay
+        this.SetMaxImpact(-1);
+        Player player = this;
+        Task.Delay(5000).ContinueWith(t => { player.SetMaxImpact(1); });
+    }
+
+    public int GetAvailableBomb()
+    {
+        return this.availableBomb;
+    }
+
+    public void SetAvailableBomb(int availableBomb)
+    {
+
+        this.availableBomb = availableBomb;
+    }
+
+    public int GetMaxBomb()
+    {
+        return this.maxBomb;
+    }
+
+    public void SetMaxBomb(int maxBomb)
+    {
+        this.maxBomb = maxBomb;
+    }
+
+    public void UpMaxBomb(int i = 1)
+    {
+        if (this.maxBomb == -1) return;
+
+        this.maxBomb = this.maxBomb +i;
+    }
+
+    public int GetMaxImpact()
+    {
+        return this.maxImpact;
+    }
+
+    public void SetMaxImpact(int maxImpact)
+    {
+        this.maxImpact = maxImpact;
+    }
+
+    public void UpMaxImpact(int i = 1)
+    {
+        this.maxImpact = this.maxImpact + i;
     }
 
     public bool GetCanMove()
@@ -28,6 +84,16 @@ public class Player
     public void SetCanMove(bool canMove)
     {
         this.canMove = canMove;
+    }
+
+    public bool GetCanShoot()
+    {
+        return this.canShoot;
+    }
+
+    public void SetCanShoot(bool canShoot)
+    {
+        this.canShoot = canShoot;
     }
 
     public bool IsDead()
@@ -94,6 +160,7 @@ public class Player
             this.instanciateGameObject.GetComponent<Movement>().player = this;
             this.instanciateGameObject.GetComponent<Shoot>().player = this;
             this.instanciateGameObject.GetComponent<Health>().player = this;
+            this.instanciateGameObject.GetComponent<Ability>().player = this;
         }
     }
 

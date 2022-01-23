@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4418920731576095640}
   - component: {fileID: 4418920731576095643}
-  - component: {fileID: 6868310703515968460}
+  - component: {fileID: 4644690029263052634}
   m_Layer: 0
   m_Name: Bomb
   m_TagString: Bomb
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &6868310703515968460
+--- !u!114 &4644690029263052634
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

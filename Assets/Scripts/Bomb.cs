@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using System;
 
-public class Explode : MonoBehaviour
+public class Bomb : MonoBehaviour
 {
-
-    private float timerDestroy = 1.1f;
     public GameObject fireGameObject;
-    private int firedistance = 1;
+    public Player player;
+    private float timerDestroy = 1.1f;
 
     // Start is called before the first frame update
     void Start()
@@ -20,6 +19,8 @@ public class Explode : MonoBehaviour
     public void instantiateFire()
     {
 
+        if (player.GetMaxImpact() == 0) return;
+
         Instantiate(fireGameObject, new Vector3(gameObject.transform.position.x, gameObject.transform.position.y), gameObject.transform.rotation);
 
         bool right = true;
@@ -27,8 +28,12 @@ public class Explode : MonoBehaviour
         bool top = true;
         bool bottom = true;
 
-        for (int i = 1; i <= firedistance; i++)
+        player.GetMaxImpact();
+
+        for (int i = 1; i <= player.GetMaxImpact() || player.GetMaxImpact() == -1 ; i++)
         {
+
+            if (!right && !left && !top && !bottom) break;
 
             try
             {

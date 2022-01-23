@@ -10,8 +10,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     // static games parameters and configuration
-    public static int roundNum = 0;
-    public static int winNum = 0;
+    public static int roundNum = 1;
+    public static int winNum = 1;
 
     public static int colNum = 17;
     public static int rowNum = 13;
@@ -53,12 +53,18 @@ public class GameManager : MonoBehaviour
     public GameObject GamePanel;
     public GameObject FinishPanel;
     public GameObject MessagePanel;
+    public GameObject PlayerOnePanel;
+    public GameObject PlayerTwoPanel;
 
     private TextMeshProUGUI TMPRoundNum;
-    private TextMeshProUGUI TMPPlayerOneWinNum;
-    private TextMeshProUGUI TMPPlayerTwoWinNum;
-    private TextMeshProUGUI TMPPlayerOneHealth;
-    private TextMeshProUGUI TMPPlayerTwoHealth;
+    private TextMeshProUGUI TMPPlayerOneWin;
+    private TextMeshProUGUI TMPPlayerTwoWin;
+    private TextMeshProUGUI TMPPlayerOneLife;
+    private TextMeshProUGUI TMPPlayerTwoLife;
+    private TextMeshProUGUI TMPPlayerOneBomb;
+    private TextMeshProUGUI TMPPlayerTwoBomb;
+    private TextMeshProUGUI TMPPlayerOneDistance;
+    private TextMeshProUGUI TMPPlayerTwoDistance;
 
     // game dynamique variables
     private Cell[][] groundCellsLayer = new Cell[rowNum][];
@@ -101,11 +107,17 @@ public class GameManager : MonoBehaviour
         MenuPanel.SetActive(false);
         FinishPanel.SetActive(false);
 
-        TMPRoundNum = GamePanel.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
-        TMPPlayerOneWinNum = GamePanel.transform.GetChild(6).GetComponent<TextMeshProUGUI>();
-        TMPPlayerTwoWinNum = GamePanel.transform.GetChild(7).GetComponent<TextMeshProUGUI>();
-        TMPPlayerOneHealth = GamePanel.transform.GetChild(2).GetComponent<TextMeshProUGUI>();
-        TMPPlayerTwoHealth = GamePanel.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
+        TMPRoundNum = GamePanel.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
+
+        TMPPlayerOneWin = PlayerOnePanel.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
+        TMPPlayerTwoWin = PlayerTwoPanel.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
+        TMPPlayerOneLife = PlayerOnePanel.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
+        TMPPlayerTwoLife = PlayerTwoPanel.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
+        TMPPlayerOneBomb = PlayerOnePanel.transform.GetChild(6).GetComponent<TextMeshProUGUI>();
+        TMPPlayerTwoBomb = PlayerTwoPanel.transform.GetChild(6).GetComponent<TextMeshProUGUI>();
+
+        TMPPlayerOneDistance = PlayerOnePanel.transform.GetChild(7).GetComponent<TextMeshProUGUI>();
+        TMPPlayerTwoDistance = PlayerTwoPanel.transform.GetChild(7).GetComponent<TextMeshProUGUI>();
 }
 
     // Update is called once per frame
@@ -114,27 +126,40 @@ public class GameManager : MonoBehaviour
         if (Input.GetKey("escape"))
         {
             enabled = false;
+            lockPlayer();
             MenuPanel.SetActive(true);
         }
 
             // display game info
 
-            if (roundNum < 1) TMPRoundNum.text = currentRoundNum.ToString()+" / inf";
+        if (roundNum < 1) TMPRoundNum.text = currentRoundNum.ToString()+" / inf";
         else TMPRoundNum.text = currentRoundNum.ToString()+" / "+roundNum.ToString();
 
         if (winNum < 1)
         {
-            TMPPlayerOneWinNum.text = "Win "+players[0].GetWinNum().ToString()+" / inf";
-            TMPPlayerTwoWinNum.text = "Win "+players[1].GetWinNum().ToString()+" / inf";
+
+            TMPPlayerOneWin.text = players[0].GetWinNum().ToString()+" / inf";
+            TMPPlayerTwoWin.text = players[1].GetWinNum().ToString()+" / inf";
         }
         else
         {
-            TMPPlayerOneWinNum.text = "Win "+players[0].GetWinNum().ToString()+" / "+winNum.ToString();
-            TMPPlayerTwoWinNum.text = "Win "+players[1].GetWinNum().ToString()+" / " + winNum.ToString();
+            TMPPlayerOneWin.text = players[0].GetWinNum().ToString()+" / "+winNum.ToString();
+            TMPPlayerTwoWin.text = players[1].GetWinNum().ToString()+" / " + winNum.ToString();
         }
 
-        TMPPlayerOneHealth.text = "Life "+ players[0].GetHealt().ToString();
-        TMPPlayerTwoHealth.text = "Life "+ players[1].GetHealt().ToString();
+        TMPPlayerOneLife.text = players[0].GetHealt().ToString();
+        TMPPlayerTwoLife.text = players[1].GetHealt().ToString();
+
+        if (players[0].GetMaxImpact() == -1) TMPPlayerOneDistance.text = "inf";
+        else TMPPlayerOneDistance.text = players[0].GetMaxImpact().ToString();
+
+        if (players[1].GetMaxImpact() == -1) TMPPlayerTwoDistance.text = "inf";
+        else TMPPlayerTwoDistance.text = players[1].GetMaxImpact().ToString();
+
+
+        TMPPlayerOneBomb.text = players[0].GetAvailableBomb().ToString();
+        TMPPlayerTwoBomb.text = players[1].GetAvailableBomb().ToString();
+
 
         if (players[0].IsDead() || players[1].IsDead()) // if one player is dead
         {
@@ -245,14 +270,45 @@ public class GameManager : MonoBehaviour
 
     }
 
+    private void lockPlayer(Player player = null)
+    {
+        if(player == null)
+        {
+            players[0].SetCanMove(false);
+            players[1].SetCanMove(false);
+            players[0].SetCanShoot(false);
+            players[1].SetCanShoot(false);
+        }
+        else
+        {
+            player.SetCanMove(false);
+            player.SetCanShoot(false);
+        }
+    }
+
+    private void unlockPlayer(Player player = null)
+    {
+        if (player == null)
+        {
+            players[0].SetCanMove(true);
+            players[1].SetCanMove(true);
+            players[0].SetCanShoot(true);
+            players[1].SetCanShoot(true);
+        }
+        else
+        {
+            player.SetCanMove(true);
+            player.SetCanShoot(true);
+        }
+    }
+
     private void resetGame()
     {
 
         MessagePanel.SetActive(true);
         MessagePanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Round " + currentRoundNum.ToString();
 
-        players[0].SetCanMove(false);
-        players[1].SetCanMove(false);
+        lockPlayer();
 
         InvokeRepeating("resetProcess", 0, 0.7f);
 
@@ -271,8 +327,8 @@ public class GameManager : MonoBehaviour
             CancelInvoke();
             currentResetNum = 0;
 
-            players[0].SetCanMove(true);
-            players[1].SetCanMove(true);
+            unlockPlayer();
+
             MessagePanel.SetActive(false);
 
             enabled = true;
@@ -282,20 +338,11 @@ public class GameManager : MonoBehaviour
 
     private void CleanGame(){
 
-        foreach(Player player in players)
-        {
-            player.KillAndErase();
-        }
+        foreach (Player player in players) player.KillAndErase();
 
-        foreach(GameObject fire in GameObject.FindGameObjectsWithTag("Fire"))
-        {
-            Destroy(fire);
-        }
-
-        foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Bomb"))
-        {
-            Destroy(fire);
-        }
+        foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Fire")) Destroy(fire);
+        foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Bomb")) Destroy(fire);
+        foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Bonus")) Destroy(fire);
 
         for (int r = 0; r < rowNum; r++)
         {
@@ -316,6 +363,7 @@ public class GameManager : MonoBehaviour
     {
         MenuPanel.SetActive(false);
         this.enabled = true;
+        unlockPlayer();
         
     }
 

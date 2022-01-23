@@ -58,8 +58,6 @@ public class Movement : MonoBehaviour
         }
 
     }
-
-
     private void OnDestroy()
     {
         try
@@ -67,7 +65,6 @@ public class Movement : MonoBehaviour
             Destroy(TMPPlayerNum.gameObject);
             Destroy(instanciateCanvas.gameObject);
         }
-        catch (Exception) { }
-        
+        catch (Exception) { }   
     }
 }
