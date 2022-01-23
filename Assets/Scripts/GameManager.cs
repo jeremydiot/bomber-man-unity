@@ -51,6 +51,7 @@ public class GameManager : MonoBehaviour
 
     public GameObject MenuPanel;
     public GameObject GamePanel;
+    public GameObject FinishPanel;
 
     private TextMeshProUGUI TMPRoundNum;
     private TextMeshProUGUI TMPPlayerOneWinNum;
@@ -68,6 +69,8 @@ public class GameManager : MonoBehaviour
     };
 
     private int currentRoundNum = 1;
+
+    private int createAnimationCount = 0;
 
     private void Awake(){
         Instance = this;
@@ -95,6 +98,7 @@ public class GameManager : MonoBehaviour
 
         MenuPanel.SetActive(false);
         GamePanel.SetActive(true);
+        FinishPanel.SetActive(false);
 
         TMPRoundNum = GamePanel.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
         TMPPlayerOneWinNum = GamePanel.transform.GetChild(6).GetComponent<TextMeshProUGUI>();
@@ -110,7 +114,6 @@ public class GameManager : MonoBehaviour
         {
             enabled = false;
             MenuPanel.SetActive(true);
-            GamePanel.SetActive(false);
         }
 
             // display game info
@@ -134,7 +137,8 @@ public class GameManager : MonoBehaviour
 
         if (players[0].IsDead() || players[1].IsDead()) // if one player is dead
         {
-            enabled = false; // stop update
+            enabled = false;
+            CleanGame();
             endRound();
         }
     }
@@ -142,7 +146,6 @@ public class GameManager : MonoBehaviour
     public void endRound()
     {
         Player alivePlayer = null;
-        
         Player winPlayer = null;
         bool equality = false;
 
@@ -156,24 +159,28 @@ public class GameManager : MonoBehaviour
 
         if ((currentRoundNum >= roundNum && roundNum > 0) || (winPlayer.GetWinNum() >= winNum && winNum > 0))
         {
-            /*Debug.Log("END ROUND !");
-            Debug.Log("player win "+winPlayer.GetNumber().ToString());
-            Debug.Log("player alive "+alivePlayer.GetNumber().ToString());
-            if (equality) Debug.Log("EQUALITY !");*/
+
+            if (equality)
+            {
+                FinishPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "EQUALITY !";
+            }
+            else
+            {
+                FinishPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "PLAYER "+winPlayer.GetNumber().ToString()+" WIN !";
+            }
+            
             enabled = false;
             MenuPanel.SetActive(true);
-            GamePanel.SetActive(false);
-            CleanGame();
+            FinishPanel.SetActive(true);
+
         }
         else
         {
             currentRoundNum++;
-            CleanGame();
             DrawBreakableGameCells();
             SpawnPlayer();
             enabled = true; // start update
         }
-        
     }
     private void DrawGroundCells(){
         for (int r = 0; r < rowNum; r++)
@@ -275,7 +282,6 @@ public class GameManager : MonoBehaviour
     public void resumeBtn()
     {
         MenuPanel.SetActive(false);
-        GamePanel.SetActive(true);
         this.enabled = true;
         
     }
