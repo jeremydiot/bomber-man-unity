@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 
 public class Movement : MonoBehaviour
@@ -23,7 +24,6 @@ public class Movement : MonoBehaviour
     {
         
     }
-
 
     // Start is called before the first frame update
     void Start()
@@ -63,8 +63,12 @@ public class Movement : MonoBehaviour
 
     private void OnDestroy()
     {
-
-        Destroy(TMPPlayerNum);
+        try
+        {
+            Destroy(TMPPlayerNum.gameObject);
+            Destroy(instanciateCanvas.gameObject);
+        }
+        catch (Exception) { }
         
     }
 }

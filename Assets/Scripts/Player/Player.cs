@@ -7,13 +7,36 @@ public class Player
 
     private string[] keyboard;
     private int number;
-    private int health;
+    private int health = 10;
     private GameObject instanciateGameObject = null;
+    private int winNum = 0;
+    private Player enemy = null;
+    private bool dead = false;
 
-    public Player(int number, string[] keyboard, int health){
+    public Player(int number, string[] keyboard)
+    {
         this.number = number;
-        this.health = health;
         this.keyboard = keyboard;
+    }
+    
+    public bool IsDead()
+    {
+        return this.dead;
+    }
+
+    public Player GetEnemies()
+    {
+        return this.enemy;
+    }
+
+    public void setEnemy(Player player)
+    {
+        this.enemy = player;
+    }
+
+    public GameObject GetGameObject()
+    {
+        return this.instanciateGameObject;
     }
 
     public int GetNumber(){
@@ -39,7 +62,22 @@ public class Player
         return this.health;
     }
 
-    public void Draw(GameObject gameObject, int posX, int posY){
+    public void SetHealth(int i){
+        this.health = i;
+    }
+
+    public int UpWinNum(int i = 1)
+    {
+        this.winNum = this.winNum + i;
+        return this.winNum;
+    }
+
+    public int GetWinNum()
+    {
+        return this.winNum;
+    }
+
+    private void Draw(GameObject gameObject, int posX, int posY){
         if (this.instanciateGameObject == null){
             this.instanciateGameObject = MonoBehaviour.Instantiate(gameObject, new Vector3((float)posX, (float)posY), gameObject.transform.rotation);
             this.instanciateGameObject.GetComponent<Movement>().player = this;
@@ -48,8 +86,20 @@ public class Player
         }
     }
 
-    public void Erase(float delay = 0f){
-        MonoBehaviour.Destroy(this.instanciateGameObject, delay);
+    private void Erase(float delay = 0f){
+        if (this.instanciateGameObject != null) MonoBehaviour.Destroy(this.instanciateGameObject, delay);
         this.instanciateGameObject = null;
+        
+    }
+
+    public void KillAndErase(float delay = 0f){
+        this.dead = true;
+        this.Erase(delay);
+    }
+
+    public void RebornAndDraw(GameObject gameObject, int posX, int posY)
+    {
+        this.dead = false;
+        this.Draw(gameObject, posX, posY);
     }
 }

@@ -6,7 +6,7 @@ using System;
 public class Explode : MonoBehaviour
 {
 
-    private float timerDestroy = 1f;
+    private float timerDestroy = 1.1f;
     public GameObject fireGameObject;
     private int firedistance = 1;
 
@@ -14,7 +14,7 @@ public class Explode : MonoBehaviour
     void Start()
     {
         Destroy(gameObject, timerDestroy);
-        Invoke("instantiateFire", 0.99f);
+        Invoke("instantiateFire", 1f);
     }
 
     public void instantiateFire()
