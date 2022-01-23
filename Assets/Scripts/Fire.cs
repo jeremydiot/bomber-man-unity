@@ -20,9 +20,11 @@ public class Fire : MonoBehaviour
         GameManager.Instance.mapCellsLayer[posY][posX].Erase(1f);
         if ((GameManager.Instance.mapCellsLayer[posY][posX].GetInstanciateGameObject() == null) && spawnBonus)
         {
-            // TODO add random 1 chance on 3
-            GameManager.Instance.mapCellsLayer[posY][posX].Draw(bonusPrefab);
-            GameManager.Instance.mapCellsLayer[posY][posX].selectRandomBonus();
+            if (Random.Range(0, 3) == 0)
+            {
+                GameManager.Instance.mapCellsLayer[posY][posX].Draw(bonusPrefab);
+                GameManager.Instance.mapCellsLayer[posY][posX].selectRandomBonus();
+            }
         }
     }
 

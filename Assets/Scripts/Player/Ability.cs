@@ -26,7 +26,7 @@ public class Ability : MonoBehaviour
             }
             else if (bonusType == Cell.BonusType.infiniteImpact)
             {
-                player.infiniteImpact();
+                player.startInfiniteImpact();
             }
    
             Destroy(collision.gameObject);

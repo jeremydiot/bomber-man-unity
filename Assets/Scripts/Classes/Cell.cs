@@ -73,12 +73,14 @@ public class Cell
     }
 
 
-    public void Draw(GameObject gameObject, bool force = false)
+    public GameObject Draw(GameObject gameObject, bool force = false)
     {
         if (this.instanciateGameObject == null && (force || canDraw))
         {
             this.instanciateGameObject = MonoBehaviour.Instantiate(gameObject, new Vector3((float)col, (float)row), gameObject.transform.rotation);
+            return this.instanciateGameObject;
         }
+        return null;
     }
 
     public void Erase(float delay = 0f, bool force = false){

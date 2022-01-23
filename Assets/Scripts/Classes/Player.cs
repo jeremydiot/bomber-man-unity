@@ -15,6 +15,7 @@ public class Player
     private bool dead = false;
     private bool canMove = true;
     private bool canShoot = true;
+    private bool infiniteImpact = false;
     private int maxBomb = 1;
     private int maxImpact = 1;
     private int availableBomb = 0;
@@ -25,13 +26,17 @@ public class Player
         this.keyboard = keyboard;
     }
 
-    public void infiniteImpact(float delay = 5f)
+    public void startInfiniteImpact(int delay = 5000)
     {
-        // TODO delay
-        this.SetMaxImpact(-1);
-        Player player = this;
-        Task.Delay(5000).ContinueWith(t => { player.SetMaxImpact(1); });
+        infiniteImpact = true;
+        Task.Delay(delay).ContinueWith(t => { this.infiniteImpact = false; });
     }
+
+    public bool isInfiniteImpact()
+    {
+        return this.infiniteImpact;
+    }
+
 
     public int GetAvailableBomb()
     {

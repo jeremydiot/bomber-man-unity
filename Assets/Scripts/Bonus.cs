@@ -9,6 +9,37 @@ public class Bonus : MonoBehaviour
     void Start()
     {
         Destroy(gameObject, timerDestroy);
+
+        int posX = (int)this.gameObject.transform.position.x;
+        int posY = (int)this.gameObject.transform.position.y;
+        Cell cell = GameManager.Instance.mapCellsLayer[posY][posX];
+        Cell.BonusType bonusType = cell.GetBonusType();
+
+        SpriteRenderer spriteRenderer;
+     
+        Color spriteColor;
+
+        if (cell.GetInstanciateGameObject().tag == "Bonus")
+        {
+            if (bonusType == Cell.BonusType.moreBomb)
+            {
+                spriteColor = Color.black;
+                spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+                spriteRenderer.color = spriteColor;
+            }
+            else if (bonusType == Cell.BonusType.moreImpact)
+            {
+                spriteColor = Color.red;
+                spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+                spriteRenderer.color = spriteColor;
+            }
+            else if (bonusType == Cell.BonusType.infiniteImpact)
+            {
+                spriteColor = Color.yellow;
+                spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+                spriteRenderer.color = spriteColor;
+            }
+        }
     }
 
     private void OnDestroy()

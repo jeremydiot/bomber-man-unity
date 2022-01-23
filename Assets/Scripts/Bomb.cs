@@ -19,7 +19,7 @@ public class Bomb : MonoBehaviour
     public void instantiateFire()
     {
 
-        if (player.GetMaxImpact() == 0) return;
+        if (player.GetMaxImpact() <= 0) return;
 
         Instantiate(fireGameObject, new Vector3(gameObject.transform.position.x, gameObject.transform.position.y), gameObject.transform.rotation);
 
@@ -28,9 +28,7 @@ public class Bomb : MonoBehaviour
         bool top = true;
         bool bottom = true;
 
-        player.GetMaxImpact();
-
-        for (int i = 1; i <= player.GetMaxImpact() || player.GetMaxImpact() == -1 ; i++)
+        for (int i = 1; i <= player.GetMaxImpact() || player.isInfiniteImpact(); i++)
         {
 
             if (!right && !left && !top && !bottom) break;

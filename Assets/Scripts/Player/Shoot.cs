@@ -32,7 +32,9 @@ public class Shoot : MonoBehaviour
 
         player.SetAvailableBomb(player.GetMaxBomb()-currentShootNum);
 
-        timer += Time.deltaTime;
+
+        if(currentShootNum >= player.GetMaxBomb()) timer += Time.deltaTime;
+
 
         if (timer >= keyboardDelay)
         {

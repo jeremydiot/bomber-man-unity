@@ -150,15 +150,15 @@ public class GameManager : MonoBehaviour
         TMPPlayerOneLife.text = players[0].GetHealt().ToString();
         TMPPlayerTwoLife.text = players[1].GetHealt().ToString();
 
-        if (players[0].GetMaxImpact() == -1) TMPPlayerOneDistance.text = "inf";
+        if (players[0].isInfiniteImpact()) TMPPlayerOneDistance.text = "inf";
         else TMPPlayerOneDistance.text = players[0].GetMaxImpact().ToString();
 
-        if (players[1].GetMaxImpact() == -1) TMPPlayerTwoDistance.text = "inf";
+        if (players[1].isInfiniteImpact()) TMPPlayerTwoDistance.text = "inf";
         else TMPPlayerTwoDistance.text = players[1].GetMaxImpact().ToString();
 
 
-        TMPPlayerOneBomb.text = players[0].GetAvailableBomb().ToString();
-        TMPPlayerTwoBomb.text = players[1].GetAvailableBomb().ToString();
+        TMPPlayerOneBomb.text = players[0].GetAvailableBomb().ToString()+" / "+ players[0].GetMaxBomb().ToString();
+        TMPPlayerTwoBomb.text = players[1].GetAvailableBomb().ToString()+" / "+ players[1].GetMaxBomb().ToString();
 
 
         if (players[0].IsDead() || players[1].IsDead()) // if one player is dead
