@@ -10,8 +10,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     // static games parameters and configuration
-    public static int roundNum = 1;
-    public static int winNum = 1;
+    public static int roundNum = 0;
+    public static int winNum = 0;
 
     public static int colNum = 17;
     public static int rowNum = 13;
@@ -52,6 +52,7 @@ public class GameManager : MonoBehaviour
     public GameObject MenuPanel;
     public GameObject GamePanel;
     public GameObject FinishPanel;
+    public GameObject MessagePanel;
 
     private TextMeshProUGUI TMPRoundNum;
     private TextMeshProUGUI TMPPlayerOneWinNum;
@@ -69,8 +70,7 @@ public class GameManager : MonoBehaviour
     };
 
     private int currentRoundNum = 1;
-
-    private int createAnimationCount = 0;
+    private int currentResetNum = 0;
 
     private void Awake(){
         Instance = this;
@@ -91,13 +91,14 @@ public class GameManager : MonoBehaviour
 
     // Start is called before the first frame update
     void Start(){
+
         DrawGroundCells();
         DrawUnbreakableGameCells();
-        DrawBreakableGameCells();
-        SpawnPlayer();
 
-        MenuPanel.SetActive(false);
+        resetGame();
+
         GamePanel.SetActive(true);
+        MenuPanel.SetActive(false);
         FinishPanel.SetActive(false);
 
         TMPRoundNum = GamePanel.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
@@ -138,7 +139,7 @@ public class GameManager : MonoBehaviour
         if (players[0].IsDead() || players[1].IsDead()) // if one player is dead
         {
             enabled = false;
-            CleanGame();
+            
             endRound();
         }
     }
@@ -177,11 +178,10 @@ public class GameManager : MonoBehaviour
         else
         {
             currentRoundNum++;
-            DrawBreakableGameCells();
-            SpawnPlayer();
-            enabled = true; // start update
+            resetGame();
         }
     }
+
     private void DrawGroundCells(){
         for (int r = 0; r < rowNum; r++)
         {
@@ -245,7 +245,40 @@ public class GameManager : MonoBehaviour
 
     }
 
+    private void resetGame()
+    {
 
+        MessagePanel.SetActive(true);
+        MessagePanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Round " + currentRoundNum.ToString();
+
+        players[0].SetCanMove(false);
+        players[1].SetCanMove(false);
+
+        InvokeRepeating("resetProcess", 0, 0.7f);
+
+    }
+
+    private void resetProcess()
+    {
+        currentResetNum++;
+
+        CleanGame();
+        DrawBreakableGameCells();
+        SpawnPlayer();
+
+        if(currentResetNum >= 5)
+        {
+            CancelInvoke();
+            currentResetNum = 0;
+
+            players[0].SetCanMove(true);
+            players[1].SetCanMove(true);
+            MessagePanel.SetActive(false);
+
+            enabled = true;
+        }
+            
+    }
 
     private void CleanGame(){
 

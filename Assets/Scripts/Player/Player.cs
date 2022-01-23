@@ -12,13 +12,24 @@ public class Player
     private int winNum = 0;
     private Player enemy = null;
     private bool dead = false;
+    private bool canMove = true;
 
     public Player(int number, string[] keyboard)
     {
         this.number = number;
         this.keyboard = keyboard;
     }
-    
+
+    public bool GetCanMove()
+    {
+        return this.canMove;
+    }
+
+    public void SetCanMove(bool canMove)
+    {
+        this.canMove = canMove;
+    }
+
     public bool IsDead()
     {
         return this.dead;

@@ -12,7 +12,6 @@ public class Movement : MonoBehaviour
 
     private string[] keyboard;
     private float speed = 10;
-    private bool canMove = true;
 
     public Canvas prefabCanvas;
     private Canvas instanciateCanvas;
@@ -54,7 +53,7 @@ public class Movement : MonoBehaviour
 
         TMPPlayerNum.gameObject.transform.position = gameObject.transform.position;
 
-        if (canMove){
+        if (player.GetCanMove()){
             transform.Translate(new Vector3(x, y) * speed * Time.deltaTime);
         }
 
