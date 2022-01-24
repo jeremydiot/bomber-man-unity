@@ -11,10 +11,10 @@ GameObject:
   - component: {fileID: 3651106973004565214}
   - component: {fileID: 3651106973004565215}
   - component: {fileID: -3720017353441759654}
-  - component: {fileID: 3847212320995268793}
+  - component: {fileID: 3447054771192515668}
   m_Layer: 0
   m_Name: UnbreakableWall
-  m_TagString: Untagged
+  m_TagString: UnbreakableWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -105,8 +105,8 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 1
   m_Constraints: 7
---- !u!61 &3847212320995268793
-BoxCollider2D:
+--- !u!58 &3447054771192515668
+CircleCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -119,15 +119,5 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0.25, y: 0.25, z: 0.25, w: 0.25}
-    pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 0.984375, y: 0.984375}
-    newSize: {x: 1, y: 1}
-    adaptiveTilingThreshold: 0.5
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 1, y: 1}
-  m_EdgeRadius: 0
+  m_Radius: 0.4921875

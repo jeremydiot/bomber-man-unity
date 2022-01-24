@@ -9,23 +9,24 @@ public class Cell
     {
         none,
         moreBomb,
-        moreImpact,
-        infiniteImpact
+        moreDistance,
+        infiniteDistance
     }
 
+    public bool erasable = true;
+    public BonusType bonusType = BonusType.none;
 
     private GameObject instanciateGameObject = null;
+
     private int col = -1;
     private int row = -1;
-    private bool canErase = true;
+    
     private bool canDraw = true;
-    private BonusType bonusType = BonusType.none;
 
-    public Cell(int col, int row, int[][] forbiddenDrawPositions = null, bool canErase = true )
+    public Cell(int col, int row, int[][] forbiddenDrawPositions = null)
     {
         this.row = row;
         this.col = col;
-        this.canErase = canErase;
 
         if (forbiddenDrawPositions != null)
         {
@@ -36,46 +37,9 @@ public class Cell
         }
     }
 
-    public BonusType GetBonusType()
+    public GameObject Draw(GameObject gameObject)
     {
-        return bonusType;
-    }
-
-    public void SetBonusType(BonusType bonusType = BonusType.none)
-    {
-        this.bonusType = bonusType;
-    }
-
-    public BonusType UseBonus()
-    {
-        BonusType currentBonusType = this.GetBonusType(); 
-        this.SetBonusType(BonusType.none);
-        return currentBonusType;
-    }
-
-    public BonusType selectRandomBonus()
-    {
-        int random = Random.Range(0, 10);
-
-        if (random < 2)
-        {
-            this.bonusType = BonusType.infiniteImpact;
-        }
-        else if (random < 5)
-        {
-            this.bonusType= BonusType.moreBomb;
-        }
-        else
-        {
-            this.bonusType = BonusType.moreImpact;
-        }
-        return this.bonusType;
-    }
-
-
-    public GameObject Draw(GameObject gameObject, bool force = false)
-    {
-        if (this.instanciateGameObject == null && (force || canDraw))
+        if (this.instanciateGameObject == null && canDraw)
         {
             this.instanciateGameObject = MonoBehaviour.Instantiate(gameObject, new Vector3((float)col, (float)row), gameObject.transform.rotation);
             return this.instanciateGameObject;
@@ -83,27 +47,16 @@ public class Cell
         return null;
     }
 
-    public void Erase(float delay = 0f, bool force = false){
+    public void Erase(float delay = 0f){
 
-        if (this.IsErasable()||force){
+        if (this.erasable && this.instanciateGameObject != null)
+        {
             MonoBehaviour.Destroy(this.instanciateGameObject, delay);
             this.instanciateGameObject = null;
-            this.SetErasable(true);
-            this.bonusType = BonusType.none;
         }
-    }
-    public void SetErasable(bool canErase)
-    {
-        this.canErase = canErase;
-    }
-
-    public bool IsErasable()
-    {
-        return this.canErase;
     }
     
     public GameObject GetInstanciateGameObject(){
         return this.instanciateGameObject;
     }
-
 }

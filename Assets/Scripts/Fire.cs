@@ -13,24 +13,33 @@ public class Fire : MonoBehaviour
     {
         Destroy(gameObject, timerDestroy);
 
-        int posX = (int)gameObject.transform.position.x;
-        int posY = (int)gameObject.transform.position.y;
+        
 
-        bool spawnBonus = (GameManager.Instance.mapCellsLayer[posY][posX].GetInstanciateGameObject() != null) && (GameManager.Instance.mapCellsLayer[posY][posX].GetBonusType() == Cell.BonusType.none);
-        GameManager.Instance.mapCellsLayer[posY][posX].Erase(1f);
-        if ((GameManager.Instance.mapCellsLayer[posY][posX].GetInstanciateGameObject() == null) && spawnBonus)
-        {
-            if (Random.Range(0, 3) == 0)
-            {
-                GameManager.Instance.mapCellsLayer[posY][posX].Draw(bonusPrefab);
-                GameManager.Instance.mapCellsLayer[posY][posX].selectRandomBonus();
-            }
-        }
+
     }
 
     // Update is called once per frame
     void Update()
     {
 
+    }
+
+    private void OnDestroy()
+    {
+        int posX = (int)gameObject.transform.position.x;
+        int posY = (int)gameObject.transform.position.y;
+
+        if(GameManager.Instance.mapCellsLayer[posY][posX].GetInstanciateGameObject() != null)
+        {
+            if (GameManager.Instance.mapCellsLayer[posY][posX].GetInstanciateGameObject().tag != "Bonus")
+            {
+                GameManager.Instance.mapCellsLayer[posY][posX].Erase();
+
+                if ((GameManager.Instance.mapCellsLayer[posY][posX].GetInstanciateGameObject() == null) && GameManager.Instance.mapCellsLayer[posY][posX].bonusType != Cell.BonusType.none)
+                {
+                    GameManager.Instance.mapCellsLayer[posY][posX].Draw(bonusPrefab);
+                }
+            }
+        }
     }
 }

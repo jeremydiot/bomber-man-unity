@@ -15,18 +15,18 @@ public class Ability : MonoBehaviour
             float bonusPosY = collision.gameObject.transform.position.y;
 
             Cell cell = GameManager.Instance.mapCellsLayer[(int)bonusPosY][(int)bonusPosX];
-            Cell.BonusType bonusType = cell.UseBonus();
+            Cell.BonusType bonusType = cell.bonusType;
 
             if (bonusType == Cell.BonusType.moreBomb)
             {
-                player.UpMaxBomb();
-            }else if (bonusType == Cell.BonusType.moreImpact)
+                player.maxBomb++;
+            }else if (bonusType == Cell.BonusType.moreDistance)
             {
-                player.UpMaxImpact();
+                player.maxDistance++;
             }
-            else if (bonusType == Cell.BonusType.infiniteImpact)
+            else if (bonusType == Cell.BonusType.infiniteDistance)
             {
-                player.startInfiniteImpact();
+                player.startInfiniteDistance();
             }
    
             Destroy(collision.gameObject);

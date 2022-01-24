@@ -8,6 +8,8 @@ TagManager:
   - Undefined
   - Bomb
   - Bonus
+  - BreakableWall
+  - UnbreakableWall
   layers:
   - Default
   - TransparentFX

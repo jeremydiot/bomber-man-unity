@@ -12,9 +12,9 @@ public class Health : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (player.GetHealt() <= 0)
+        if (player.health <= 0)
         {
-            player.GetEnemies().UpWinNum();
+            player.GetEnemy().winNum++;
             player.KillAndErase();
             
         }
@@ -24,7 +24,7 @@ public class Health : MonoBehaviour
     {
         if (collision.CompareTag("Fire"))
         {
-            player.DownHealth();
+            player.health--;
         }
     }
 }

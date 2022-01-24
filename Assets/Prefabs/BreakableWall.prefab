@@ -10,11 +10,11 @@ GameObject:
   m_Component:
   - component: {fileID: 2301321693982930834}
   - component: {fileID: 2301321693982930835}
-  - component: {fileID: -5862497023587721642}
+  - component: {fileID: 6530903152410375984}
   - component: {fileID: -7455433751596135354}
   m_Layer: 0
   m_Name: BreakableWall
-  m_TagString: Untagged
+  m_TagString: BreakableWall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -84,7 +84,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!50 &-5862497023587721642
+--- !u!50 &6530903152410375984
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0
@@ -99,7 +99,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 0
+  m_GravityScale: 1
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1

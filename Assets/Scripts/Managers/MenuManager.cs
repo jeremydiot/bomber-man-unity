@@ -64,8 +64,8 @@ public class MenuManager : MonoBehaviour
 
 
     public void startGame(){
-        GameManager.roundNum = roundNum;
-        GameManager.winNum = winNum;
+        GameManager.roundMaxNum = roundNum;
+        GameManager.winMaxNum = winNum;
         SceneManager.LoadScene(1);
     }
 

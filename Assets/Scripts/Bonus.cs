@@ -12,8 +12,9 @@ public class Bonus : MonoBehaviour
 
         int posX = (int)this.gameObject.transform.position.x;
         int posY = (int)this.gameObject.transform.position.y;
+
         Cell cell = GameManager.Instance.mapCellsLayer[posY][posX];
-        Cell.BonusType bonusType = cell.GetBonusType();
+        Cell.BonusType bonusType = cell.bonusType;
 
         SpriteRenderer spriteRenderer;
      
@@ -27,13 +28,13 @@ public class Bonus : MonoBehaviour
                 spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
                 spriteRenderer.color = spriteColor;
             }
-            else if (bonusType == Cell.BonusType.moreImpact)
+            else if (bonusType == Cell.BonusType.moreDistance)
             {
                 spriteColor = Color.red;
                 spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
                 spriteRenderer.color = spriteColor;
             }
-            else if (bonusType == Cell.BonusType.infiniteImpact)
+            else if (bonusType == Cell.BonusType.infiniteDistance)
             {
                 spriteColor = Color.yellow;
                 spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
@@ -48,6 +49,6 @@ public class Bonus : MonoBehaviour
         int posY = (int)gameObject.transform.position.y;
 
         Cell cell = GameManager.Instance.mapCellsLayer[(int)posY][(int)posX];
-        cell.SetBonusType(Cell.BonusType.none);
+        cell.bonusType = Cell.BonusType.none;
     }
 }

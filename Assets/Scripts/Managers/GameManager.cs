@@ -10,11 +10,16 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     // static games parameters and configuration
-    public static int roundNum = 1;
-    public static int winNum = 1;
+    public static int roundMaxNum = 1;
+    public static int winMaxNum = 1;
 
     public static int colNum = 17;
     public static int rowNum = 13;
+
+    private static int breakableWallNum = 40;
+    private static int infiniteDistanceBonusNum = 4;
+    private static int moreBombBonus = 4;   
+    private static int moreDistanceBonus = 6;
 
     public static int[][] SpawnPositions = new int[][]
     {
@@ -24,6 +29,7 @@ public class GameManager : MonoBehaviour
         new int[] { colNum - 2, rowNum - 2 },
             
     };
+
     public static int[][] ForbiddenDrawPositions = new int[][]
     {
         new int[] { 1, 2 },
@@ -67,12 +73,11 @@ public class GameManager : MonoBehaviour
     private TextMeshProUGUI TMPPlayerTwoDistance;
 
     // game dynamique variables
-    private Cell[][] groundCellsLayer = new Cell[rowNum][];
     public Cell[][] mapCellsLayer = new Cell[rowNum][];
 
     private Player[] players = new Player[]{
         new Player(1, new string[]{"z", "q", "s", "d", "space"}),
-        new Player(2,  new string[]{"up", "left", "down", "right", "return"})
+        new Player(2, new string[]{"up", "left", "down", "right", "return"})
     };
 
     private int currentRoundNum = 1;
@@ -84,22 +89,18 @@ public class GameManager : MonoBehaviour
         //init cells layers
         for (int r = 0; r < rowNum; r++)
         {
-            groundCellsLayer[r] = new Cell[colNum];
             mapCellsLayer[r] = new Cell[colNum];
 
             for (int c = 0; c < colNum; c++)
             {
-                groundCellsLayer[r][c]=new Cell(c, r, canErase:false);
                 mapCellsLayer[r][c]=new Cell(c, r, ForbiddenDrawPositions);
+                Instantiate(groundPrefab, new Vector3(c,r), groundPrefab.transform.rotation);
             }
         }
     }
 
     // Start is called before the first frame update
     void Start(){
-
-        DrawGroundCells();
-        DrawUnbreakableGameCells();
 
         resetGame();
 
@@ -115,10 +116,9 @@ public class GameManager : MonoBehaviour
         TMPPlayerTwoLife = PlayerTwoPanel.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
         TMPPlayerOneBomb = PlayerOnePanel.transform.GetChild(6).GetComponent<TextMeshProUGUI>();
         TMPPlayerTwoBomb = PlayerTwoPanel.transform.GetChild(6).GetComponent<TextMeshProUGUI>();
-
         TMPPlayerOneDistance = PlayerOnePanel.transform.GetChild(7).GetComponent<TextMeshProUGUI>();
         TMPPlayerTwoDistance = PlayerTwoPanel.transform.GetChild(7).GetComponent<TextMeshProUGUI>();
-}
+    }
 
     // Update is called once per frame
     void Update(){
@@ -132,33 +132,33 @@ public class GameManager : MonoBehaviour
 
             // display game info
 
-        if (roundNum < 1) TMPRoundNum.text = currentRoundNum.ToString()+" / inf";
-        else TMPRoundNum.text = currentRoundNum.ToString()+" / "+roundNum.ToString();
+        if (roundMaxNum < 1) TMPRoundNum.text = currentRoundNum.ToString()+" / inf";
+        else TMPRoundNum.text = currentRoundNum.ToString()+" / "+roundMaxNum.ToString();
 
-        if (winNum < 1)
+        if (winMaxNum < 1)
         {
 
-            TMPPlayerOneWin.text = players[0].GetWinNum().ToString()+" / inf";
-            TMPPlayerTwoWin.text = players[1].GetWinNum().ToString()+" / inf";
+            TMPPlayerOneWin.text = players[0].winNum.ToString()+" / inf";
+            TMPPlayerTwoWin.text = players[1].winNum.ToString()+" / inf";
         }
         else
         {
-            TMPPlayerOneWin.text = players[0].GetWinNum().ToString()+" / "+winNum.ToString();
-            TMPPlayerTwoWin.text = players[1].GetWinNum().ToString()+" / " + winNum.ToString();
+            TMPPlayerOneWin.text = players[0].winNum.ToString()+" / "+winMaxNum.ToString();
+            TMPPlayerTwoWin.text = players[1].winNum.ToString()+" / " + winMaxNum.ToString();
         }
 
-        TMPPlayerOneLife.text = players[0].GetHealt().ToString();
-        TMPPlayerTwoLife.text = players[1].GetHealt().ToString();
+        TMPPlayerOneLife.text = players[0].health.ToString();
+        TMPPlayerTwoLife.text = players[1].health.ToString();
 
-        if (players[0].isInfiniteImpact()) TMPPlayerOneDistance.text = "inf";
-        else TMPPlayerOneDistance.text = players[0].GetMaxImpact().ToString();
+        if (players[0].isInfiniteDistance()) TMPPlayerOneDistance.text = "inf";
+        else TMPPlayerOneDistance.text = players[0].maxDistance.ToString();
 
-        if (players[1].isInfiniteImpact()) TMPPlayerTwoDistance.text = "inf";
-        else TMPPlayerTwoDistance.text = players[1].GetMaxImpact().ToString();
+        if (players[1].isInfiniteDistance()) TMPPlayerTwoDistance.text = "inf";
+        else TMPPlayerTwoDistance.text = players[1].maxDistance.ToString();
 
 
-        TMPPlayerOneBomb.text = players[0].GetAvailableBomb().ToString()+" / "+ players[0].GetMaxBomb().ToString();
-        TMPPlayerTwoBomb.text = players[1].GetAvailableBomb().ToString()+" / "+ players[1].GetMaxBomb().ToString();
+        TMPPlayerOneBomb.text = players[0].availableBomb.ToString()+" / "+ players[0].maxBomb.ToString();
+        TMPPlayerTwoBomb.text = players[1].availableBomb.ToString()+" / "+ players[1].maxBomb.ToString();
 
 
         if (players[0].IsDead() || players[1].IsDead()) // if one player is dead
@@ -166,6 +166,71 @@ public class GameManager : MonoBehaviour
             enabled = false;
             
             endRound();
+        }
+    }
+    private void drawMapCells()
+    {
+        int currentBreakableWallNum = breakableWallNum;
+        int currentInfiniteDistanceBonusNum = infiniteDistanceBonusNum;
+        int currentMoreBombBonus = moreBombBonus;
+        int currentMoreDistanceBonus = moreDistanceBonus;
+
+        List<Cell> possibleBonusCells = new List<Cell>();
+
+        // unBreakableWall
+        for (int r = 0; r < mapCellsLayer.Length; r++)
+        {
+            for (int c = 0; c < mapCellsLayer[r].Length; c++)
+            {
+
+                Cell cell = mapCellsLayer[r][c];
+
+                if (r == 0 || c == 0 || r == rowNum - 1 || c == colNum - 1 || (r % 2 == 0 && c % 2 == 0))
+                {
+                    cell.erasable = false;
+                    cell.Draw(UnbreakableWallPrefab);
+                }
+            }
+        }
+
+        // breakableWall
+        while (currentBreakableWallNum > 0){
+            int r = Random.Range(1, rowNum-1);
+            int c = Random.Range(1, colNum-1);
+
+            if (mapCellsLayer[r][c].Draw(BreakableWallPrefab) != null)
+            {
+
+                possibleBonusCells.Add(mapCellsLayer[r][c]);
+                currentBreakableWallNum--;
+            }
+        }
+
+        // add bonus
+        foreach (Cell cell in possibleBonusCells)
+        {
+            if (currentInfiniteDistanceBonusNum > 0)
+            {
+                cell.bonusType = Cell.BonusType.infiniteDistance;
+                currentInfiniteDistanceBonusNum--;
+                continue;
+                
+            }
+            else if (currentMoreBombBonus > 0)
+            {
+                cell.bonusType = Cell.BonusType.moreBomb;
+                currentMoreBombBonus--;
+                continue;
+            }
+            else if (currentMoreDistanceBonus > 0)
+            {
+                cell.bonusType = Cell.BonusType.moreDistance;
+                currentMoreDistanceBonus--;
+                continue;
+            }
+            
+            break;
+
         }
     }
 
@@ -179,11 +244,11 @@ public class GameManager : MonoBehaviour
         {
             if (!player.IsDead())alivePlayer = player;
             if (winPlayer == null) winPlayer = player;
-            else if (winPlayer.GetWinNum() < player.GetWinNum()) winPlayer = player;
-            else if (winPlayer.GetWinNum() == player.GetWinNum()) equality = true;
+            else if (winPlayer.winNum < player.winNum) winPlayer = player;
+            else if (winPlayer.winNum == player.winNum) equality = true;
         }
 
-        if ((currentRoundNum >= roundNum && roundNum > 0) || (winPlayer.GetWinNum() >= winNum && winNum > 0))
+        if ((currentRoundNum >= roundMaxNum && roundMaxNum > 0) || (winPlayer.winNum >= winMaxNum && winMaxNum > 0))
         {
 
             if (equality)
@@ -207,63 +272,17 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private void DrawGroundCells(){
-        for (int r = 0; r < rowNum; r++)
-        {
-            for (int c = 0; c < colNum; c++)
-            {
-                Cell cell = groundCellsLayer[r][c];
-                cell.Draw(groundPrefab);
-            }
-        }
-    }
-    private void DrawUnbreakableGameCells()
-    {
-        for (int r = 0; r < rowNum; r++)
-        {
-            for (int c = 0; c < colNum; c++)
-            {
 
-                Cell cell = mapCellsLayer[r][c];
-
-                if (r == 0 || c == 0 || r == rowNum-1 || c == colNum-1 || (r % 2 == 0 && c % 2 == 0))
-                {
-                    cell.Draw(UnbreakableWallPrefab);
-                    cell.SetErasable(false);
-                }
-            }
-        }
-    }
-    private void DrawBreakableGameCells()
-    {
-
-        for (int r = 0; r < rowNum; r++)
-        {
-            for (int c = 0; c < colNum; c++)
-            {
-                Cell cell = mapCellsLayer[r][c];
-
-                if (cell.GetInstanciateGameObject() == null)
-                {
-                    if (Random.Range(0, 2) == 1)
-                    {
-                        cell.Draw(BreakableWallPrefab);
-                    }
-                }
-
-            }
-        }
-    }
-    private void SpawnPlayer(){
+    private void spawnPlayer(){
 
         int positionPlayerOne = Random.Range(0, 2);
         int positionPlayerTwo = Random.Range(2, 4);
 
-        players[0].RebornAndDraw(PlayerPrefab, SpawnPositions[positionPlayerOne][0], SpawnPositions[positionPlayerOne][1]);
-        players[1].RebornAndDraw(PlayerPrefab, SpawnPositions[positionPlayerTwo][0], SpawnPositions[positionPlayerTwo][1]);
+        players[0].reset();
+        players[1].reset();
 
-        players[0].SetHealth(10);
-        players[1].SetHealth(10);
+        players[0].ResuscitAndDraw(PlayerPrefab, SpawnPositions[positionPlayerOne][0], SpawnPositions[positionPlayerOne][1]);
+        players[1].ResuscitAndDraw(PlayerPrefab, SpawnPositions[positionPlayerTwo][0], SpawnPositions[positionPlayerTwo][1]);
     
         players[0].setEnemy(players[1]);
         players[1].setEnemy(players[0]);
@@ -274,15 +293,15 @@ public class GameManager : MonoBehaviour
     {
         if(player == null)
         {
-            players[0].SetCanMove(false);
-            players[1].SetCanMove(false);
-            players[0].SetCanShoot(false);
-            players[1].SetCanShoot(false);
+            players[0].canMove = false;
+            players[1].canMove = false;
+            players[0].canShoot = false;
+            players[1].canShoot = false;
         }
         else
         {
-            player.SetCanMove(false);
-            player.SetCanShoot(false);
+            player.canShoot = false;
+            player.canMove = false;
         }
     }
 
@@ -290,15 +309,15 @@ public class GameManager : MonoBehaviour
     {
         if (player == null)
         {
-            players[0].SetCanMove(true);
-            players[1].SetCanMove(true);
-            players[0].SetCanShoot(true);
-            players[1].SetCanShoot(true);
+            players[0].canMove = true;
+            players[1].canMove = true;
+            players[0].canShoot = true;
+            players[1].canShoot = true;
         }
         else
         {
-            player.SetCanMove(true);
-            player.SetCanShoot(true);
+            player.canMove = true;
+            player.canShoot = true;
         }
     }
 
@@ -312,33 +331,31 @@ public class GameManager : MonoBehaviour
 
         InvokeRepeating("resetProcess", 0, 0.7f);
 
+        
     }
 
     private void resetProcess()
     {
         currentResetNum++;
 
-        CleanGame();
-        DrawBreakableGameCells();
-        SpawnPlayer();
+        cleanGame();
+        drawMapCells();
+        spawnPlayer();
 
         if(currentResetNum >= 5)
         {
             CancelInvoke();
             currentResetNum = 0;
-
             unlockPlayer();
-
             MessagePanel.SetActive(false);
-
             enabled = true;
         }
             
     }
 
-    private void CleanGame(){
+    private void cleanGame(){
 
-        foreach (Player player in players) player.KillAndErase();
+        foreach (Player player in players)player.KillAndErase();
 
         foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Fire")) Destroy(fire);
         foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Bomb")) Destroy(fire);
@@ -348,13 +365,8 @@ public class GameManager : MonoBehaviour
         {
             for (int c = 0; c < colNum; c++)
             {
-                Cell cell = mapCellsLayer[r][c];
-
-                if (cell.IsErasable())
-                {
-                    cell.Erase();
-                }
-
+                mapCellsLayer[r][c].Erase();
+                mapCellsLayer[r][c].bonusType = Cell.BonusType.none;
             }
         }
     }

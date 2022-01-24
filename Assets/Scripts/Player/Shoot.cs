@@ -8,11 +8,9 @@ public class Shoot : MonoBehaviour
     public Player player;
     public GameObject bombGameObject;
 
-    private string[] keyboard; 
-    private float timer = 2f;
-    private float keyboardDelay = 2f;
-    private int currentShootNum = 0;
-    
+    private string[] keyboard;
+    private List<float> timers = new List<float>();
+    private float maxTimer = 2.5f;
     private GameObject currentBomb = null;
 
     private void Awake()
@@ -29,23 +27,26 @@ public class Shoot : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        player.availableBomb = player.maxBomb - timers.Count;
 
-        player.SetAvailableBomb(player.GetMaxBomb()-currentShootNum);
-
-
-        if(currentShootNum >= player.GetMaxBomb()) timer += Time.deltaTime;
-
-
-        if (timer >= keyboardDelay)
+        for (int i =0; i < timers.Count; i++)
         {
-            timer = 0;
-            currentShootNum = 0;
+            timers[i] += Time.deltaTime;
         }
+
+        for (int i = 0; i < timers.Count; i++)
+        {
+            if(timers[i] >= maxTimer)
+            {
+                timers.RemoveAt(i);
+            }
+        }
+        
 
         if (Input.GetKey(keyboard[4]))
         {
 
-            if (currentShootNum < player.GetMaxBomb() && player.GetCanShoot())
+            if (timers.Count < player.maxBomb && player.canShoot)
             {
                 int playerPosX = (int)Mathf.Round(transform.position.x);
                 int playerPoxY = (int)Mathf.Round(transform.position.y);
@@ -53,7 +54,7 @@ public class Shoot : MonoBehaviour
 
                 if (currentBomb == null)
                 {
-                    currentShootNum++;
+                    timers.Add(0f);
                     currentBomb = Instantiate(bombGameObject, new Vector3(playerPosX, playerPoxY), transform.rotation);
                     currentBomb.GetComponent<Bomb>().player = player;
                 }
@@ -65,7 +66,7 @@ public class Shoot : MonoBehaviour
 
                     if(playerPosX != currentBombPosX || playerPoxY != currentBombPosY)
                     {
-                        currentShootNum++;
+                        timers.Add(0f);
                         currentBomb = Instantiate(bombGameObject, new Vector3(playerPosX, playerPoxY), transform.rotation);
                         currentBomb.GetComponent<Bomb>().player = player;
                     }
