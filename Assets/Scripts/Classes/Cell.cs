@@ -59,4 +59,14 @@ public class Cell
     public GameObject GetInstanciateGameObject(){
         return this.instanciateGameObject;
     }
+
+    public int getColNum()
+    {
+        return this.col;
+    }
+
+    public int getRowNum()
+    {
+        return this.row;
+    }
 }

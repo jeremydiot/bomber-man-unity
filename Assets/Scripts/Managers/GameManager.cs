@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public static int colNum = 17;
     public static int rowNum = 13;
 
-    private static int breakableWallNum = 40;
+    private static int breakableWallNum = 30;
     private static int infiniteDistanceBonusNum = 4;
     private static int moreBombBonus = 4;   
     private static int moreDistanceBonus = 6;

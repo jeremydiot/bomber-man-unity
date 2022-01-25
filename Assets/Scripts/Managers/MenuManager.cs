@@ -7,11 +7,11 @@ using TMPro;
 public class MenuManager : MonoBehaviour
 {
 
-    private static int roundNum = 1;
-    private static int winNum = 1;
+    private static int roundNum = 3;
+    private static int timeNum = 120;
 
     public GameObject TMPRoundNum;
-    public GameObject TMPWinNum;
+    public GameObject TMPTimeNum;
 
 
     public 
@@ -24,13 +24,13 @@ public class MenuManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (winNum == 0)
+        if (timeNum == 0)
         {
-            TMPWinNum.GetComponent<TextMeshProUGUI>().text = "inf";
+            TMPTimeNum.GetComponent<TextMeshProUGUI>().text = "inf";
         }
         else
         {
-            TMPWinNum.GetComponent<TextMeshProUGUI>().text = winNum.ToString();
+            TMPTimeNum.GetComponent<TextMeshProUGUI>().text = timeNum.ToString();
         }
 
         if (roundNum == 0)
@@ -53,19 +53,19 @@ public class MenuManager : MonoBehaviour
         if (roundNum > 0) roundNum--;
     }
 
-    public void upWinNum()
+    public void upTimeNum()
     {
-        if(winNum < 99) winNum++;
+        if(timeNum < 240) timeNum++; // max 4 minutes
     }
-    public void downWinNum()
+    public void downTimeNum()
     {
-        if(winNum > 0) winNum--;
+        if(timeNum > 0) timeNum--;
     }
 
 
     public void startGame(){
         GameManager.roundMaxNum = roundNum;
-        GameManager.winMaxNum = winNum;
+        GameManager.winMaxNum = timeNum;
         SceneManager.LoadScene(1);
     }
 

@@ -12,7 +12,7 @@ public class Player
     private int number;
 
     // state
-    public int health = 10;
+    public int health = 1;
     public int winNum = 0;
 
     public int maxBomb = 1;
@@ -40,7 +40,7 @@ public class Player
         this.maxBomb = 1;
         this.availableBomb = 1;
         this.maxDistance = 1;
-        this.health = 10;
+        this.health = 1;
     }
 
     public void startInfiniteDistance(int delay = 10000)

@@ -23,61 +23,76 @@ public class Bomb : MonoBehaviour
 
         Instantiate(fireGameObject, new Vector3(gameObject.transform.position.x, gameObject.transform.position.y), gameObject.transform.rotation);
 
-        bool right = true;
-        bool left = true;
-        bool top = true;
-        bool bottom = true;
+        bool[] directions = new bool[]
+        {
+            true, // left
+            true, // right
+            true, // top
+            true // bottom
+        };
+
+        int posX = (int)gameObject.transform.position.x;
+        int posY = (int)gameObject.transform.position.y;
+
+        int maxY = GameManager.rowNum -1;
+        int maxX = GameManager.colNum -1;
 
         for (int i = 1; i <= player.maxDistance || player.isInfiniteDistance(); i++)
         {
 
-            if (!right && !left && !top && !bottom) break;
-
-            try
+            if (!directions[0] && !directions[1] && !directions[2] && !directions[3]) break;
+            Cell[] cells = new Cell[]
             {
-                if (GameManager.Instance.mapCellsLayer[(int)gameObject.transform.position.y][(int)gameObject.transform.position.x - i].erasable && left)
-                    Instantiate(fireGameObject, new Vector3(gameObject.transform.position.x - i, gameObject.transform.position.y), gameObject.transform.rotation);
-                else
-                    left = false;
-            }
-            catch (IndexOutOfRangeException) {
-                left = false;
-            }
+                null, // left
+                null, // right
+                null, // top
+                null // bottom
+            };
 
-            try
+            if (posX - i >= 0) // left
             {
-                if (GameManager.Instance.mapCellsLayer[(int)gameObject.transform.position.y][(int)gameObject.transform.position.x + i].erasable && right)
-                    Instantiate(fireGameObject, new Vector3(gameObject.transform.position.x + i, gameObject.transform.position.y), gameObject.transform.rotation);
-                else
-                    right = false;
-            }
-            catch (IndexOutOfRangeException) {
-                right = false;
+                cells[0] = GameManager.Instance.mapCellsLayer[posY][posX - i];
             }
 
-            try
+            if (posX + i <= maxX) // right
             {
-                if (GameManager.Instance.mapCellsLayer[(int)gameObject.transform.position.y - i][(int)gameObject.transform.position.x].erasable && bottom)
-                    Instantiate(fireGameObject, new Vector3(gameObject.transform.position.x, gameObject.transform.position.y - i), gameObject.transform.rotation);
-                else
-                    bottom = false;
-            }
-            catch (IndexOutOfRangeException) {
-                bottom = false;
+                cells[1] = GameManager.Instance.mapCellsLayer[posY][posX + i];
             }
 
-            try
+            if (posY + i <= maxY) // top
             {
-                if (GameManager.Instance.mapCellsLayer[(int)gameObject.transform.position.y + i][(int)gameObject.transform.position.x].erasable && top)
-                    Instantiate(fireGameObject, new Vector3(gameObject.transform.position.x, gameObject.transform.position.y + i), gameObject.transform.rotation);
-                else
-                    top = false;
+                cells[2] = GameManager.Instance.mapCellsLayer[posY + i][posX];
             }
-            catch (IndexOutOfRangeException) {
-                top = false;
+
+            if (posY - i >= 0) // bottom
+            {
+                cells[3] = GameManager.Instance.mapCellsLayer[posY - i][posX];
+            }
+
+            for (int j = 0; j < 4; j++)
+            {
+                if(cells[j] != null)
+                {
+                    if (cells[j].erasable && directions[j])
+                    {
+                        Instantiate(fireGameObject, new Vector3(cells[j].getColNum(), cells[j].getRowNum()), gameObject.transform.rotation);
+                        if (cells[j].GetInstanciateGameObject() != null)
+                        {
+                            if(cells[j].GetInstanciateGameObject().tag == "BreakableWall")
+                            {
+                                directions[j] = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        directions[j] = false;
+                    }
+                }
             }
         }
-    }
+     }
+    
 
     // Update is called once per frame
     void Update()

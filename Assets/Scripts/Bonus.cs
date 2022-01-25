@@ -4,11 +4,10 @@ using UnityEngine;
 
 public class Bonus : MonoBehaviour
 {
-    private float timerDestroy = 5f;
+
     // Start is called before the first frame update
     void Start()
     {
-        Destroy(gameObject, timerDestroy);
 
         int posX = (int)this.gameObject.transform.position.x;
         int posY = (int)this.gameObject.transform.position.y;
