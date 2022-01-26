@@ -10,8 +10,8 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
 
     // static games parameters and configuration
-    public static int roundMaxNum = 1;
-    public static int winMaxNum = 1;
+    public static int maxRoundNum = 3;
+    public static float maxTimeNum = 10f;
 
     public static int colNum = 17;
     public static int rowNum = 13;
@@ -63,6 +63,7 @@ public class GameManager : MonoBehaviour
     public GameObject PlayerTwoPanel;
 
     private TextMeshProUGUI TMPRoundNum;
+    private TextMeshProUGUI TMPTimeNum;
     private TextMeshProUGUI TMPPlayerOneWin;
     private TextMeshProUGUI TMPPlayerTwoWin;
     private TextMeshProUGUI TMPPlayerOneLife;
@@ -82,10 +83,13 @@ public class GameManager : MonoBehaviour
 
     private int currentRoundNum = 1;
     private int currentResetNum = 0;
+    
+    private float currentTime = 120f;
 
     private void Awake(){
         Instance = this;
 
+        currentTime = maxTimeNum;
         //init cells layers
         for (int r = 0; r < rowNum; r++)
         {
@@ -109,6 +113,9 @@ public class GameManager : MonoBehaviour
         FinishPanel.SetActive(false);
 
         TMPRoundNum = GamePanel.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
+        TMPTimeNum = GamePanel.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
+        
+        TMPTimeNum.text = ((int)currentTime).ToString();
 
         TMPPlayerOneWin = PlayerOnePanel.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
         TMPPlayerTwoWin = PlayerTwoPanel.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
@@ -130,22 +137,21 @@ public class GameManager : MonoBehaviour
             MenuPanel.SetActive(true);
         }
 
-            // display game info
+        // display game info
 
-        if (roundMaxNum < 1) TMPRoundNum.text = currentRoundNum.ToString()+" / inf";
-        else TMPRoundNum.text = currentRoundNum.ToString()+" / "+roundMaxNum.ToString();
-
-        if (winMaxNum < 1)
+        if (currentTime > 0)
         {
+            currentTime -= Time.deltaTime;
+            if (currentTime <= 0) currentTime = 0;
+        }
 
-            TMPPlayerOneWin.text = players[0].winNum.ToString()+" / inf";
-            TMPPlayerTwoWin.text = players[1].winNum.ToString()+" / inf";
-        }
-        else
-        {
-            TMPPlayerOneWin.text = players[0].winNum.ToString()+" / "+winMaxNum.ToString();
-            TMPPlayerTwoWin.text = players[1].winNum.ToString()+" / " + winMaxNum.ToString();
-        }
+        TMPTimeNum.text = ((int)currentTime).ToString();
+
+        if (maxRoundNum < 1) TMPRoundNum.text = currentRoundNum.ToString()+" / inf";
+        else TMPRoundNum.text = currentRoundNum.ToString()+" / "+maxRoundNum.ToString();
+
+        TMPPlayerOneWin.text = players[0].winNum.ToString();
+        TMPPlayerTwoWin.text = players[1].winNum.ToString();
 
         TMPPlayerOneLife.text = players[0].health.ToString();
         TMPPlayerTwoLife.text = players[1].health.ToString();
@@ -160,12 +166,23 @@ public class GameManager : MonoBehaviour
         TMPPlayerOneBomb.text = players[0].availableBomb.ToString()+" / "+ players[0].maxBomb.ToString();
         TMPPlayerTwoBomb.text = players[1].availableBomb.ToString()+" / "+ players[1].maxBomb.ToString();
 
-
+        // end game / round
         if (players[0].IsDead() || players[1].IsDead()) // if one player is dead
         {
-            enabled = false;
-            
             endRound();
+        }
+
+        if (currentTime <= 0)
+        {
+            for (int r = 0; r < rowNum; r++)
+            {
+                for (int c = 0; c < colNum; c++)
+                {
+                    mapCellsLayer[r][c].Erase(force: true);
+                    mapCellsLayer[r][c].Draw(UnbreakableWallPrefab, force: true);
+
+                }
+            }
         }
     }
     private void drawMapCells()
@@ -242,14 +259,15 @@ public class GameManager : MonoBehaviour
 
         foreach (Player player in players)
         {
-            if (!player.IsDead())alivePlayer = player;
+            if (!player.IsDead()) alivePlayer = player;
             if (winPlayer == null) winPlayer = player;
             else if (winPlayer.winNum < player.winNum) winPlayer = player;
             else if (winPlayer.winNum == player.winNum) equality = true;
         }
 
-        if ((currentRoundNum >= roundMaxNum && roundMaxNum > 0) || (winPlayer.winNum >= winMaxNum && winMaxNum > 0))
+        if ((currentRoundNum >= maxRoundNum && maxRoundNum > 0))
         {
+            
 
             if (equality)
             {
@@ -324,14 +342,15 @@ public class GameManager : MonoBehaviour
     private void resetGame()
     {
 
-        MessagePanel.SetActive(true);
-        MessagePanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Round " + currentRoundNum.ToString();
+        enabled = false;
 
+        currentTime = maxTimeNum;
         lockPlayer();
-
-        InvokeRepeating("resetProcess", 0, 0.7f);
-
         
+        MessagePanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Round " + currentRoundNum.ToString();
+        MessagePanel.SetActive(true);
+        
+        InvokeRepeating("resetProcess", 0, 0.7f);
     }
 
     private void resetProcess()
@@ -352,6 +371,8 @@ public class GameManager : MonoBehaviour
         }
             
     }
+
+
 
     private void cleanGame(){
 

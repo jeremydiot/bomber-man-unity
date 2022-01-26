@@ -1,5 +1,11 @@
 # BombermanUnity
 
+## TODO
+
+- Max time => remplissage du jeu à la fin / mort subite
+- retirer max win
+- bonus qui apparait aléatoirement
+
 ## Spécifications minimales
 
 - 2 joueurs

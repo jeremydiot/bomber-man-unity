@@ -37,9 +37,9 @@ public class Cell
         }
     }
 
-    public GameObject Draw(GameObject gameObject)
+    public GameObject Draw(GameObject gameObject, bool force = false)
     {
-        if (this.instanciateGameObject == null && canDraw)
+        if (this.instanciateGameObject == null && (canDraw || force))
         {
             this.instanciateGameObject = MonoBehaviour.Instantiate(gameObject, new Vector3((float)col, (float)row), gameObject.transform.rotation);
             return this.instanciateGameObject;
@@ -47,9 +47,9 @@ public class Cell
         return null;
     }
 
-    public void Erase(float delay = 0f){
+    public void Erase(float delay = 0f, bool force = false){
 
-        if (this.erasable && this.instanciateGameObject != null)
+        if (( this.erasable || force ) && this.instanciateGameObject != null )
         {
             MonoBehaviour.Destroy(this.instanciateGameObject, delay);
             this.instanciateGameObject = null;
