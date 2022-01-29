@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
@@ -11,15 +12,15 @@ public class GameManager : MonoBehaviour
 
     // static games parameters and configuration
     public static int maxRoundNum = 3;
-    public static float maxTimeNum = 10f;
+    public static float maxTimeNum = 120f;
 
     public static int colNum = 17;
     public static int rowNum = 13;
 
-    private static int breakableWallNum = 30;
-    private static int infiniteDistanceBonusNum = 4;
-    private static int moreBombBonus = 4;   
-    private static int moreDistanceBonus = 6;
+    private static int breakableWallNum = 40;
+    private static int infiniteDistanceBonusNum = 6;
+    private static int moreBombBonus = 6;   
+    private static int moreDistanceBonus = 8;
 
     public static int[][] SpawnPositions = new int[][]
     {
@@ -55,42 +56,26 @@ public class GameManager : MonoBehaviour
     public GameObject BreakableWallPrefab;
     public GameObject PlayerPrefab;
 
-    public GameObject MenuPanel;
-    public GameObject GamePanel;
-    public GameObject FinishPanel;
-    public GameObject MessagePanel;
-    public GameObject PlayerOnePanel;
-    public GameObject PlayerTwoPanel;
-
-    private TextMeshProUGUI TMPRoundNum;
-    private TextMeshProUGUI TMPTimeNum;
-    private TextMeshProUGUI TMPPlayerOneWin;
-    private TextMeshProUGUI TMPPlayerTwoWin;
-    private TextMeshProUGUI TMPPlayerOneLife;
-    private TextMeshProUGUI TMPPlayerTwoLife;
-    private TextMeshProUGUI TMPPlayerOneBomb;
-    private TextMeshProUGUI TMPPlayerTwoBomb;
-    private TextMeshProUGUI TMPPlayerOneDistance;
-    private TextMeshProUGUI TMPPlayerTwoDistance;
+    private GamePanels panels;
 
     // game dynamique variables
     public Cell[][] mapCellsLayer = new Cell[rowNum][];
 
-    private Player[] players = new Player[]{
+    public Player[] players = new Player[]{
         new Player(1, new string[]{"z", "q", "s", "d", "space"}),
         new Player(2, new string[]{"up", "left", "down", "right", "return"})
     };
 
-    private int currentRoundNum = 1;
-    private int currentResetNum = 0;
-    
-    private float currentTime = 120f;
+    public int currentRoundNum = 1;
+    public float currentTime = maxTimeNum;
+    public string finishMessage;
 
     private void Awake(){
         Instance = this;
 
-        currentTime = maxTimeNum;
-        //init cells layers
+        panels = gameObject.GetComponent<GamePanels>();
+        
+        //init cells layer
         for (int r = 0; r < rowNum; r++)
         {
             mapCellsLayer[r] = new Cell[colNum];
@@ -102,89 +87,11 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-
-    // Start is called before the first frame update
+    
     void Start(){
-
-        resetGame();
-
-        GamePanel.SetActive(true);
-        MenuPanel.SetActive(false);
-        FinishPanel.SetActive(false);
-
-        TMPRoundNum = GamePanel.transform.GetChild(3).GetComponent<TextMeshProUGUI>();
-        TMPTimeNum = GamePanel.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
-        
-        TMPTimeNum.text = ((int)currentTime).ToString();
-
-        TMPPlayerOneWin = PlayerOnePanel.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
-        TMPPlayerTwoWin = PlayerTwoPanel.transform.GetChild(5).GetComponent<TextMeshProUGUI>();
-        TMPPlayerOneLife = PlayerOnePanel.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
-        TMPPlayerTwoLife = PlayerTwoPanel.transform.GetChild(4).GetComponent<TextMeshProUGUI>();
-        TMPPlayerOneBomb = PlayerOnePanel.transform.GetChild(6).GetComponent<TextMeshProUGUI>();
-        TMPPlayerTwoBomb = PlayerTwoPanel.transform.GetChild(6).GetComponent<TextMeshProUGUI>();
-        TMPPlayerOneDistance = PlayerOnePanel.transform.GetChild(7).GetComponent<TextMeshProUGUI>();
-        TMPPlayerTwoDistance = PlayerTwoPanel.transform.GetChild(7).GetComponent<TextMeshProUGUI>();
+        resetGame(0f);
     }
 
-    // Update is called once per frame
-    void Update(){
-
-        if (Input.GetKey("escape"))
-        {
-            enabled = false;
-            lockPlayer();
-            MenuPanel.SetActive(true);
-        }
-
-        // display game info
-
-        if (currentTime > 0)
-        {
-            currentTime -= Time.deltaTime;
-            if (currentTime <= 0) currentTime = 0;
-        }
-
-        TMPTimeNum.text = ((int)currentTime).ToString();
-
-        if (maxRoundNum < 1) TMPRoundNum.text = currentRoundNum.ToString()+" / inf";
-        else TMPRoundNum.text = currentRoundNum.ToString()+" / "+maxRoundNum.ToString();
-
-        TMPPlayerOneWin.text = players[0].winNum.ToString();
-        TMPPlayerTwoWin.text = players[1].winNum.ToString();
-
-        TMPPlayerOneLife.text = players[0].health.ToString();
-        TMPPlayerTwoLife.text = players[1].health.ToString();
-
-        if (players[0].isInfiniteDistance()) TMPPlayerOneDistance.text = "inf";
-        else TMPPlayerOneDistance.text = players[0].maxDistance.ToString();
-
-        if (players[1].isInfiniteDistance()) TMPPlayerTwoDistance.text = "inf";
-        else TMPPlayerTwoDistance.text = players[1].maxDistance.ToString();
-
-
-        TMPPlayerOneBomb.text = players[0].availableBomb.ToString()+" / "+ players[0].maxBomb.ToString();
-        TMPPlayerTwoBomb.text = players[1].availableBomb.ToString()+" / "+ players[1].maxBomb.ToString();
-
-        // end game / round
-        if (players[0].IsDead() || players[1].IsDead()) // if one player is dead
-        {
-            endRound();
-        }
-
-        if (currentTime <= 0)
-        {
-            for (int r = 0; r < rowNum; r++)
-            {
-                for (int c = 0; c < colNum; c++)
-                {
-                    mapCellsLayer[r][c].Erase(force: true);
-                    mapCellsLayer[r][c].Draw(UnbreakableWallPrefab, force: true);
-
-                }
-            }
-        }
-    }
     private void drawMapCells()
     {
         int currentBreakableWallNum = breakableWallNum;
@@ -251,36 +158,25 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void endRound()
+    public void endRound(Player deadPlayer)
     {
-        Player alivePlayer = null;
-        Player winPlayer = null;
-        bool equality = false;
+        lockGame();
 
-        foreach (Player player in players)
+        Player winPlayer = deadPlayer.GetEnemy();
+        winPlayer.winNum++;
+        if (deadPlayer.winNum > winPlayer.winNum) winPlayer = deadPlayer;
+        
+        bool equality = deadPlayer.winNum == deadPlayer.GetEnemy().winNum;
+
+        if ((currentRoundNum >= maxRoundNum || winPlayer.winNum > maxRoundNum/2) && maxRoundNum > 0)
         {
-            if (!player.IsDead()) alivePlayer = player;
-            if (winPlayer == null) winPlayer = player;
-            else if (winPlayer.winNum < player.winNum) winPlayer = player;
-            else if (winPlayer.winNum == player.winNum) equality = true;
-        }
-
-        if ((currentRoundNum >= maxRoundNum && maxRoundNum > 0))
-        {
+            currentTime = maxTimeNum;
+            lockGame();
             
-
-            if (equality)
-            {
-                FinishPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "EQUALITY !";
-            }
-            else
-            {
-                FinishPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "PLAYER "+winPlayer.GetNumber().ToString()+" WIN !";
-            }
+            if (equality) finishMessage = "EQUALITY !";
+            else finishMessage = "PLAYER " + winPlayer.GetNumber().ToString() + " WIN !";
             
-            enabled = false;
-            MenuPanel.SetActive(true);
-            FinishPanel.SetActive(true);
+            Invoke("endGameProcess",1f);
 
         }
         else
@@ -290,7 +186,50 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void endGameProcess()
+    {
+        cleanGame();
+        panels.Finish(finishMessage);
+    }
 
+    public void lockGame()
+    {
+        gameObject.GetComponent<TimeOver>().enabled = false;
+
+        players[0].freeze();
+        players[1].freeze();
+    }
+
+    public void unlockGame()
+    {
+        gameObject.GetComponent<TimeOver>().enabled = true;
+        
+        players[0].unfreeze();
+        players[1].unfreeze();
+    }
+
+    private void resetGame(float delay = 1f)
+    {
+        currentTime = maxTimeNum;
+        lockGame();
+        Invoke("resetProcessStart",delay);
+    }
+    private void resetProcessStart()
+    {
+        panels.Message("Round " + currentRoundNum.ToString());
+        Invoke("resetProcessEnd",2f);
+        cleanGame();
+        drawMapCells();
+        spawnPlayer();
+        lockGame();
+    }
+    
+    private void resetProcessEnd()
+    {
+        panels.Message("", false);
+        unlockGame();
+    }
+    
     private void spawnPlayer(){
 
         int positionPlayerOne = Random.Range(0, 2);
@@ -299,84 +238,17 @@ public class GameManager : MonoBehaviour
         players[0].reset();
         players[1].reset();
 
-        players[0].ResuscitAndDraw(PlayerPrefab, SpawnPositions[positionPlayerOne][0], SpawnPositions[positionPlayerOne][1]);
-        players[1].ResuscitAndDraw(PlayerPrefab, SpawnPositions[positionPlayerTwo][0], SpawnPositions[positionPlayerTwo][1]);
+        players[0].Draw(PlayerPrefab, SpawnPositions[positionPlayerOne][0], SpawnPositions[positionPlayerOne][1]);
+        players[1].Draw(PlayerPrefab, SpawnPositions[positionPlayerTwo][0], SpawnPositions[positionPlayerTwo][1]);
     
         players[0].setEnemy(players[1]);
         players[1].setEnemy(players[0]);
 
     }
-
-    private void lockPlayer(Player player = null)
-    {
-        if(player == null)
-        {
-            players[0].canMove = false;
-            players[1].canMove = false;
-            players[0].canShoot = false;
-            players[1].canShoot = false;
-        }
-        else
-        {
-            player.canShoot = false;
-            player.canMove = false;
-        }
-    }
-
-    private void unlockPlayer(Player player = null)
-    {
-        if (player == null)
-        {
-            players[0].canMove = true;
-            players[1].canMove = true;
-            players[0].canShoot = true;
-            players[1].canShoot = true;
-        }
-        else
-        {
-            player.canMove = true;
-            player.canShoot = true;
-        }
-    }
-
-    private void resetGame()
-    {
-
-        enabled = false;
-
-        currentTime = maxTimeNum;
-        lockPlayer();
-        
-        MessagePanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Round " + currentRoundNum.ToString();
-        MessagePanel.SetActive(true);
-        
-        InvokeRepeating("resetProcess", 0, 0.7f);
-    }
-
-    private void resetProcess()
-    {
-        currentResetNum++;
-
-        cleanGame();
-        drawMapCells();
-        spawnPlayer();
-
-        if(currentResetNum >= 5)
-        {
-            CancelInvoke();
-            currentResetNum = 0;
-            unlockPlayer();
-            MessagePanel.SetActive(false);
-            enabled = true;
-        }
-            
-    }
-
-
-
+    
     private void cleanGame(){
 
-        foreach (Player player in players)player.KillAndErase();
+        foreach (Player player in players)player.Erase();
 
         foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Fire")) Destroy(fire);
         foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Bomb")) Destroy(fire);
@@ -386,23 +258,11 @@ public class GameManager : MonoBehaviour
         {
             for (int c = 0; c < colNum; c++)
             {
-                mapCellsLayer[r][c].Erase();
+                mapCellsLayer[r][c].Erase(force:true);
+                mapCellsLayer[r][c].erasable = true;
                 mapCellsLayer[r][c].bonusType = Cell.BonusType.none;
             }
         }
-    }
-
-    public void resumeBtn()
-    {
-        MenuPanel.SetActive(false);
-        this.enabled = true;
-        unlockPlayer();
-        
-    }
-
-    public void quitGameBtn()
-    {
-        SceneManager.LoadScene(0);
     }
 }
 

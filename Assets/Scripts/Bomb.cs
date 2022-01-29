@@ -7,18 +7,15 @@ public class Bomb : MonoBehaviour
 {
     public GameObject fireGameObject;
     public Player player;
-    private float timerDestroy = 2.6f;
-
-    // Start is called before the first frame update
+    private float timerDestroy = 2.5f;
+    
     void Start()
     {
         Destroy(gameObject, timerDestroy);
-        Invoke("instantiateFire", 2.5f);
     }
 
-    public void instantiateFire()
+    private void OnDestroy()
     {
-
         if (player.maxDistance <= 0) return;
 
         Instantiate(fireGameObject, new Vector3(gameObject.transform.position.x, gameObject.transform.position.y), gameObject.transform.rotation);
@@ -91,12 +88,5 @@ public class Bomb : MonoBehaviour
                 }
             }
         }
-     }
-    
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 }

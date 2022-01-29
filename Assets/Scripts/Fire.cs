@@ -8,20 +8,9 @@ public class Fire : MonoBehaviour
     private float timerDestroy = 1f;
     public GameObject bonusPrefab;
 
-    // Start is called before the first frame update
     void Start()
     {
         Destroy(gameObject, timerDestroy);
-
-        
-
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     private void OnDestroy()
