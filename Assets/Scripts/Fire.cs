@@ -18,15 +18,15 @@ public class Fire : MonoBehaviour
         int posX = (int)gameObject.transform.position.x;
         int posY = (int)gameObject.transform.position.y;
 
-        if(GameManager.Instance.mapCellsLayer[posY][posX].GetInstanciateGameObject() != null)
+        if(GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject() != null)
         {
-            if (GameManager.Instance.mapCellsLayer[posY][posX].GetInstanciateGameObject().tag != "Bonus")
+            if (!GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject().CompareTag("Bonus"))
             {
-                GameManager.Instance.mapCellsLayer[posY][posX].Erase();
+                GameManager.Instance.mapCellsLayer[posX][posY].Erase();
 
-                if ((GameManager.Instance.mapCellsLayer[posY][posX].GetInstanciateGameObject() == null) && GameManager.Instance.mapCellsLayer[posY][posX].bonusType != Cell.BonusType.none)
+                if ((GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject() == null) && GameManager.Instance.mapCellsLayer[posX][posY].bonusType != Cell.BonusType.None)
                 {
-                    GameManager.Instance.mapCellsLayer[posY][posX].Draw(bonusPrefab);
+                    GameManager.Instance.mapCellsLayer[posX][posY].Draw(bonusPrefab);
                 }
             }
         }

@@ -16,9 +16,12 @@ public class Bomb : MonoBehaviour
 
     private void OnDestroy()
     {
+        int posX = Mathf.RoundToInt(transform.position.x);
+        int posY = Mathf.RoundToInt(transform.position.y);
+        
         if (player.maxDistance <= 0) return;
 
-        Instantiate(fireGameObject, new Vector3(gameObject.transform.position.x, gameObject.transform.position.y), gameObject.transform.rotation);
+        Instantiate(fireGameObject, new Vector3(posX, posY), transform.rotation);
 
         bool[] directions = new bool[]
         {
@@ -28,13 +31,12 @@ public class Bomb : MonoBehaviour
             true // bottom
         };
 
-        int posX = (int)gameObject.transform.position.x;
-        int posY = (int)gameObject.transform.position.y;
+        
 
-        int maxY = GameManager.rowNum -1;
-        int maxX = GameManager.colNum -1;
+        int maxY = GameManager.YLength -1;
+        int maxX = GameManager.XLength -1;
 
-        for (int i = 1; i <= player.maxDistance || player.isInfiniteDistance(); i++)
+        for (int i = 1; i <= player.maxDistance || player.IsInfiniteDistance(); i++)
         {
 
             if (!directions[0] && !directions[1] && !directions[2] && !directions[3]) break;
@@ -48,34 +50,34 @@ public class Bomb : MonoBehaviour
 
             if (posX - i >= 0) // left
             {
-                cells[0] = GameManager.Instance.mapCellsLayer[posY][posX - i];
+                cells[0] = GameManager.Instance.mapCellsLayer[posX - i][posY];
             }
 
             if (posX + i <= maxX) // right
             {
-                cells[1] = GameManager.Instance.mapCellsLayer[posY][posX + i];
+                cells[1] = GameManager.Instance.mapCellsLayer[posX + i][posY];
             }
 
             if (posY + i <= maxY) // top
             {
-                cells[2] = GameManager.Instance.mapCellsLayer[posY + i][posX];
+                cells[2] = GameManager.Instance.mapCellsLayer[posX][posY + i];
             }
 
             if (posY - i >= 0) // bottom
             {
-                cells[3] = GameManager.Instance.mapCellsLayer[posY - i][posX];
+                cells[3] = GameManager.Instance.mapCellsLayer[posX][posY - i];
             }
 
             for (int j = 0; j < 4; j++)
             {
                 if(cells[j] != null)
                 {
-                    if (cells[j].erasable && directions[j])
+                    if (cells[j].isErasable && directions[j])
                     {
-                        Instantiate(fireGameObject, new Vector3(cells[j].getColNum(), cells[j].getRowNum()), gameObject.transform.rotation);
-                        if (cells[j].GetInstanciateGameObject() != null)
+                        Instantiate(fireGameObject, new Vector3(cells[j].GetPosX(), cells[j].GetPosY()), gameObject.transform.rotation);
+                        if (cells[j].GetInstantiateGameObject() != null)
                         {
-                            if(cells[j].GetInstanciateGameObject().tag == "BreakableWall")
+                            if(cells[j].GetInstantiateGameObject().tag == "BreakableWall")
                             {
                                 directions[j] = false;
                             }

@@ -3,70 +3,92 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
+/* 
+ * Class to manage game cells and its properties
+ */
 public class Cell
 {
+    // Player bonus
     public enum BonusType
     {
-        none,
-        moreBomb,
-        moreDistance,
-        infiniteDistance
+        None,
+        MoreBomb,
+        MoreDistance,
+        InfiniteDistance
     }
 
-    public bool erasable = true;
-    public BonusType bonusType = BonusType.none;
-
+    // Properties
+    public bool isErasable = true;
+    public BonusType bonusType = BonusType.None;
+    
     private GameObject instanciateGameObject = null;
 
-    private int col = -1;
-    private int row = -1;
+    private int posX; // Position X on game grid
+    private int posY; // Position Y on game grid
     
-    private bool canDraw = true;
+    private bool isDrawable = true; // Forbidden draw gameObject positions
 
-    public Cell(int col, int row, int[][] forbiddenDrawPositions = null)
+    public Cell(int posX, int posY, int[][] forbiddenDrawPositions = null)
     {
-        this.row = row;
-        this.col = col;
+        this.posY = posY;
+        this.posX = posX;
 
         if (forbiddenDrawPositions != null)
         {
             foreach (int[] position in forbiddenDrawPositions)
-            {
-                if (this.col == position[0] && this.row == position[1]) canDraw = false;
+            {   
+                // Disable gameObject drawing if position is disabled 
+                if (this.posX == position[0] && this.posY == position[1]) isDrawable = false;
             }
         }
     }
 
+    /*
+     * Instantiate gameObject
+     * return instantiate gameObject 
+     */
     public GameObject Draw(GameObject gameObject, bool force = false)
     {
-        if (this.instanciateGameObject == null && (canDraw || force))
+        if (this.instanciateGameObject == null && (isDrawable || force))
         {
-            this.instanciateGameObject = MonoBehaviour.Instantiate(gameObject, new Vector3((float)col, (float)row), gameObject.transform.rotation);
+            this.instanciateGameObject = MonoBehaviour.Instantiate(gameObject, new Vector3((float)posX, (float)posY), gameObject.transform.rotation);
             return this.instanciateGameObject;
         }
         return null;
     }
 
+    /*
+     * Destroy gameObject
+     */
     public void Erase(float delay = 0f, bool force = false){
 
-        if (( this.erasable || force ) && this.instanciateGameObject != null )
+        if (( this.isErasable || force ) && this.instanciateGameObject != null )
         {
             MonoBehaviour.Destroy(this.instanciateGameObject, delay);
             this.instanciateGameObject = null;
         }
     }
     
-    public GameObject GetInstanciateGameObject(){
+    /*
+     * Get current gameObject
+     */
+    public GameObject GetInstantiateGameObject(){
         return this.instanciateGameObject;
     }
 
-    public int getColNum()
+    /*
+     * Get X position
+     */
+    public int GetPosX()
     {
-        return this.col;
+        return this.posX;
     }
 
-    public int getRowNum()
+    /*
+     * Get Y position
+     */
+    public int GetPosY()
     {
-        return this.row;
+        return this.posY;
     }
 }

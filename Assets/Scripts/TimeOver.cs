@@ -78,9 +78,9 @@ public class TimeOver : MonoBehaviour
 
     private void drawWall()
     {
-        GameManager.Instance.mapCellsLayer[posY][posX].Erase(force: true);
-        GameManager.Instance.mapCellsLayer[posY][posX].Draw(UnbreakableWallPrefab, force: true);
-        GameManager.Instance.mapCellsLayer[posY][posX].erasable=false;
+        GameManager.Instance.mapCellsLayer[posX][posY].Erase(force: true);
+        GameManager.Instance.mapCellsLayer[posX][posY].Draw(UnbreakableWallPrefab, force: true);
+        GameManager.Instance.mapCellsLayer[posX][posY].isErasable=false;
         
         if(posX==5 && posY==4) CancelInvoke(); // stop instantiate wall
         

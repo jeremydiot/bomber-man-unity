@@ -13,32 +13,22 @@ public class Health : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        int playerPosX = (int)Mathf.Round(transform.position.x);
-        int playerPoxY = (int)Mathf.Round(transform.position.y);
-        
         if (player.health <= 0 && !once)
         {
             once = true;
-            GameManager.Instance.endRound(player);
+            GameManager.Instance.EndRound(player);
         }
 
-        if (GameManager.Instance.mapCellsLayer[playerPoxY][playerPosX].GetInstanciateGameObject() != null)
+        int posX = Mathf.RoundToInt(transform.position.x);
+        int posY = Mathf.RoundToInt(transform.position.y);
+        
+        if (GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject() != null)
         {
-            if (GameManager.Instance.mapCellsLayer[playerPoxY][playerPosX].GetInstanciateGameObject().CompareTag("UnbreakableWall") && !once)
+            if (GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject().CompareTag("UnbreakableWall"))
             {
-                inWallTimer += Time.deltaTime;
-                if (inWallTimer >= 1f)
-                {
-                    once = true;
-                    GameManager.Instance.endRound(player);    
-                }
-            }
-            else
-            {
-                inWallTimer = 0f;
+                player.health = 0;    
             }
         }
-        
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

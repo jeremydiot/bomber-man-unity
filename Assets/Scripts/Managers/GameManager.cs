@@ -1,166 +1,235 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
+using Random = UnityEngine.Random;
 
+/*
+ * Class to centralize general gameplay variables and functionalities
+ */
 public class GameManager : MonoBehaviour
 {
-    // provide acces to general game information
+    // Provide access to current general game variables
     public static GameManager Instance;
 
-    // static games parameters and configuration
-    public static int maxRoundNum = 3;
-    public static float maxTimeNum = 120f;
+    // Static games parameters and configuration
+    public static int MaxRoundNum = 3; // Init by MenuManager
+    public static float MaxTimeNum = 120f; // Init by MenuManager
 
-    public static int colNum = 17;
-    public static int rowNum = 13;
+    public static readonly int ColNum = 17; // X game board length to 0 to 16 
+    public static readonly int RowNum = 13; // Y game board length to 0 to 12
+    
+    public static readonly int XLength = ColNum;
+    public static readonly int YLength = RowNum;
+    
+    // Max number for each in game
+    private static readonly int BreakableWallNum = 40;
+    private static readonly int InfiniteDistanceBonusNum = 6;
+    private static readonly int MoreBombBonus = 6;   
+    private static readonly int MoreDistanceBonus = 8;
 
-    private static int breakableWallNum = 40;
-    private static int infiniteDistanceBonusNum = 6;
-    private static int moreBombBonus = 6;   
-    private static int moreDistanceBonus = 8;
-
-    public static int[][] SpawnPositions = new int[][]
+    // Player Spawn Positions 
+    private static readonly int[][] SpawnPositions = new int[][]
     {
         new int[] { 1, 1 },
-        new int[] { 1, rowNum - 2},
-        new int[] { colNum - 2, 1 },
-        new int[] { colNum - 2, rowNum - 2 },
+        new int[] { 1, YLength - 2 },
+        new int[] { XLength - 2, 1 },
+        new int[] { XLength - 2, YLength - 2 },
             
     };
 
-    public static int[][] ForbiddenDrawPositions = new int[][]
+    // Unauthorized gameObject instantiate position  
+    private static readonly int[][] ForbiddenDrawPositions = new int[][]
     {
         new int[] { 1, 2 },
         new int[] { 1, 1 },
         new int[] { 2, 1 },
 
-        new int[] { 1, rowNum - 3 },
-        new int[] { 1, rowNum - 2 },
-        new int[] { 2, rowNum - 2 },
+        new int[] { 1, YLength - 3 },
+        new int[] { 1, YLength - 2 },
+        new int[] { 2, YLength - 2 },
 
-        new int[] { colNum - 3, rowNum - 2 },
-        new int[] { colNum - 2, rowNum - 2 },
-        new int[] { colNum - 2, rowNum - 3 },
+        new int[] { XLength - 3, YLength - 2 },
+        new int[] { XLength - 2, YLength - 2 },
+        new int[] { XLength - 2, YLength - 3 },
 
-        new int[] { colNum - 2, 2},
-        new int[] { colNum - 2, 1 },
-        new int[] { colNum - 3, 1 },
+        new int[] { XLength - 2, 2 },
+        new int[] { XLength - 2, 1 },
+        new int[] { XLength - 3, 1 },
     };
 
-    // interface elements
+    // Interface prefab elements
     public GameObject groundPrefab;
-    public GameObject UnbreakableWallPrefab;
-    public GameObject BreakableWallPrefab;
-    public GameObject PlayerPrefab;
+    public GameObject unbreakableWallPrefab;
+    public GameObject breakableWallPrefab;
+    public GameObject playerPrefab;
 
+    // Game planels
     private GamePanels panels;
 
-    // game dynamique variables
-    public Cell[][] mapCellsLayer = new Cell[rowNum][];
-
-    public Player[] players = new Player[]{
-        new Player(1, new string[]{"z", "q", "s", "d", "space"}),
-        new Player(2, new string[]{"up", "left", "down", "right", "return"})
-    };
+    // Game variables
+    public readonly Cell[][] mapCellsLayer = new Cell[XLength][];
+    public Player[] players;
 
     public int currentRoundNum = 1;
-    public float currentTime = maxTimeNum;
-    public string finishMessage;
+    public float currentTime = MaxTimeNum;
+    private string finishMessage;
 
-    private void Awake(){
-        Instance = this;
-
-        panels = gameObject.GetComponent<GamePanels>();
-        
-        //init cells layer
-        for (int r = 0; r < rowNum; r++)
+    // Function to browse all game cell
+    private void ForEachCells(Func<int,int,Cell,Cell> callback)
+    {
+        // Init cells layer
+        for (int x = 0; x < mapCellsLayer.Length; x++)
         {
-            mapCellsLayer[r] = new Cell[colNum];
-
-            for (int c = 0; c < colNum; c++)
+            for (int y = 0; y < mapCellsLayer[x].Length; y++)
             {
-                mapCellsLayer[r][c]=new Cell(c, r, ForbiddenDrawPositions);
-                Instantiate(groundPrefab, new Vector3(c,r), groundPrefab.transform.rotation);
+                Cell cell = callback(x,y,mapCellsLayer[x][y]);
+                if (cell != null)
+                {
+                    mapCellsLayer[x][y] = cell;
+                }
             }
         }
     }
     
+    private void Awake(){
+        Instance = this;
+        panels = gameObject.GetComponent<GamePanels>();
+
+        // Init cells layer
+        for (int x = 0; x < XLength; x++){mapCellsLayer[x] = new Cell[YLength];}
+        
+        // Create ground game board and create cells
+        ForEachCells((int x,int y, Cell cell) =>
+        {
+            Instantiate(groundPrefab, new Vector3(x,y), groundPrefab.transform.rotation);
+            return new Cell(x, y, ForbiddenDrawPositions);
+        });
+        
+        // Init players
+        players = new Player[]{
+            new Player(1, new string[]{"z", "q", "s", "d", "space"}),
+            new Player(2, new string[]{"up", "left", "down", "right", "return"})
+        };
+        players[0].SetEnemy(players[1]);
+        players[1].SetEnemy(players[0]);
+    }
+    
     void Start(){
-        resetGame(0f);
+        StartCoroutine(ResetGame(0));
     }
 
-    private void drawMapCells()
+    /*
+     * Function to instantiate board gameObjects
+     */
+    private void DrawMapCells()
     {
-        int currentBreakableWallNum = breakableWallNum;
-        int currentInfiniteDistanceBonusNum = infiniteDistanceBonusNum;
-        int currentMoreBombBonus = moreBombBonus;
-        int currentMoreDistanceBonus = moreDistanceBonus;
+        int currentBreakableWallNum = BreakableWallNum;
+        int currentInfiniteDistanceBonusNum = InfiniteDistanceBonusNum;
+        int currentMoreBombBonus = MoreBombBonus;
+        int currentMoreDistanceBonus = MoreDistanceBonus;
 
         List<Cell> possibleBonusCells = new List<Cell>();
 
-        // unBreakableWall
-        for (int r = 0; r < mapCellsLayer.Length; r++)
+        // UnBreakableWall
+        ForEachCells((x, y, cell) =>
         {
-            for (int c = 0; c < mapCellsLayer[r].Length; c++)
+            if (y == 0 || x == 0 || y == YLength - 1 || x == XLength - 1 || (y % 2 == 0 && x % 2 == 0))
             {
-
-                Cell cell = mapCellsLayer[r][c];
-
-                if (r == 0 || c == 0 || r == rowNum - 1 || c == colNum - 1 || (r % 2 == 0 && c % 2 == 0))
-                {
-                    cell.erasable = false;
-                    cell.Draw(UnbreakableWallPrefab);
-                }
+                cell.isErasable = false;
+                cell.Draw(unbreakableWallPrefab);
             }
-        }
+            return null;
+        });
 
-        // breakableWall
+        // BreakableWall
         while (currentBreakableWallNum > 0){
-            int r = Random.Range(1, rowNum-1);
-            int c = Random.Range(1, colNum-1);
+            int y = Random.Range(1, YLength-1);
+            int x = Random.Range(1, XLength-1);
 
-            if (mapCellsLayer[r][c].Draw(BreakableWallPrefab) != null)
+            if (mapCellsLayer[x][y].Draw(breakableWallPrefab) != null)
             {
-
-                possibleBonusCells.Add(mapCellsLayer[r][c]);
+                possibleBonusCells.Add(mapCellsLayer[x][y]);
                 currentBreakableWallNum--;
             }
         }
 
-        // add bonus
+        // add bonus to BreakableWall
         foreach (Cell cell in possibleBonusCells)
         {
             if (currentInfiniteDistanceBonusNum > 0)
             {
-                cell.bonusType = Cell.BonusType.infiniteDistance;
+                cell.bonusType = Cell.BonusType.InfiniteDistance;
                 currentInfiniteDistanceBonusNum--;
                 continue;
                 
             }
             else if (currentMoreBombBonus > 0)
             {
-                cell.bonusType = Cell.BonusType.moreBomb;
+                cell.bonusType = Cell.BonusType.MoreBomb;
                 currentMoreBombBonus--;
                 continue;
             }
             else if (currentMoreDistanceBonus > 0)
             {
-                cell.bonusType = Cell.BonusType.moreDistance;
+                cell.bonusType = Cell.BonusType.MoreDistance;
                 currentMoreDistanceBonus--;
                 continue;
             }
             
             break;
-
         }
     }
+    
+    /*
+     * Function to reset all cells and destroy all gameplay objects
+     */
+    private void CleanGame(){
 
-    public void endRound(Player deadPlayer)
+        foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Fire")) Destroy(fire);
+        foreach (GameObject bomb in GameObject.FindGameObjectsWithTag("Bomb")) Destroy(bomb);
+        foreach (GameObject bonus in GameObject.FindGameObjectsWithTag("Bonus")) Destroy(bonus);
+        
+        // Reset each cells
+        ForEachCells((x, y, cell) =>
+        {
+            cell.isErasable = true;
+            cell.Erase();
+            cell.bonusType = Cell.BonusType.None;
+            
+            return null;
+        });
+    }
+
+    /*
+     * Function to lock players and timer
+     */
+    public void LockGame()
     {
-        lockGame();
+        gameObject.GetComponent<TimeOver>().enabled = false;
+        players[0].Freeze();
+        players[1].Freeze();
+    }
+
+    /*
+     * Function to unlock players and timer
+     */
+    public void UnlockGame()
+    {
+        gameObject.GetComponent<TimeOver>().enabled = true;
+        players[0].Unfreeze();
+        players[1].Unfreeze();
+    }
+    
+    /*
+     * Function called when one player is dead 
+     */
+    public void EndRound(Player deadPlayer)
+    {
+        LockGame();
 
         Player winPlayer = deadPlayer.GetEnemy();
         winPlayer.winNum++;
@@ -168,101 +237,77 @@ public class GameManager : MonoBehaviour
         
         bool equality = deadPlayer.winNum == deadPlayer.GetEnemy().winNum;
 
-        if ((currentRoundNum >= maxRoundNum || winPlayer.winNum > maxRoundNum/2) && maxRoundNum > 0)
+        if ((currentRoundNum >= MaxRoundNum || (winPlayer.winNum > MaxRoundNum/2) && MaxRoundNum > 0))
         {
-            currentTime = maxTimeNum;
-            lockGame();
-            
+            currentTime = MaxTimeNum;
+
             if (equality) finishMessage = "EQUALITY !";
             else finishMessage = "PLAYER " + winPlayer.GetNumber().ToString() + " WIN !";
             
-            Invoke("endGameProcess",1f);
-
+            StartCoroutine(EndGame());
         }
         else
         {
             currentRoundNum++;
-            resetGame();
+            StartCoroutine(ResetGame());
         }
     }
 
-    private void endGameProcess()
+    /*
+     * Display end game result
+     */
+    private IEnumerator EndGame()
     {
-        cleanGame();
+        
+        LockGame();
+        yield return new WaitForSeconds(1);
+        
+        currentTime = MaxTimeNum;
+        
+        CleanGame();
         panels.Finish(finishMessage);
     }
 
-    public void lockGame()
+    /*
+     * Function to init or reinit game
+     */
+    private IEnumerator ResetGame(int timer = 1)
     {
-        gameObject.GetComponent<TimeOver>().enabled = false;
-
-        players[0].freeze();
-        players[1].freeze();
-    }
-
-    public void unlockGame()
-    {
-        gameObject.GetComponent<TimeOver>().enabled = true;
+        LockGame();
+        yield return new WaitForSeconds(timer);
         
-        players[0].unfreeze();
-        players[1].unfreeze();
-    }
-
-    private void resetGame(float delay = 1f)
-    {
-        currentTime = maxTimeNum;
-        lockGame();
-        Invoke("resetProcessStart",delay);
-    }
-    private void resetProcessStart()
-    {
+        currentTime = MaxTimeNum;
         panels.Message("Round " + currentRoundNum.ToString());
-        Invoke("resetProcessEnd",2f);
-        cleanGame();
-        drawMapCells();
-        spawnPlayer();
-        lockGame();
-    }
-    
-    private void resetProcessEnd()
-    {
-        panels.Message("", false);
-        unlockGame();
-    }
-    
-    private void spawnPlayer(){
 
+        CleanGame();
+        DrawMapCells();
+        
+        // player positions
         int positionPlayerOne = Random.Range(0, 2);
         int positionPlayerTwo = Random.Range(2, 4);
+        
+        players[0].Reset(playerPrefab,SpawnPositions[positionPlayerOne][0], SpawnPositions[positionPlayerOne][1]);
+        players[1].Reset(playerPrefab, SpawnPositions[positionPlayerTwo][0], SpawnPositions[positionPlayerTwo][1]);
+        
+        players[0].Freeze();
+        players[1].Freeze();
+        
+        yield return new WaitForSeconds(2);
+        
+        panels.Message("", false);
+        UnlockGame();
+    }
 
-        players[0].reset();
-        players[1].reset();
+    private void OnEnable()
+    {
+        UnlockGame();
+    }
 
-        players[0].Draw(PlayerPrefab, SpawnPositions[positionPlayerOne][0], SpawnPositions[positionPlayerOne][1]);
-        players[1].Draw(PlayerPrefab, SpawnPositions[positionPlayerTwo][0], SpawnPositions[positionPlayerTwo][1]);
-    
-        players[0].setEnemy(players[1]);
-        players[1].setEnemy(players[0]);
-
+    private void OnDisable()
+    {
+        LockGame();
     }
     
-    private void cleanGame(){
 
-        foreach (Player player in players)player.Erase();
-
-        foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Fire")) Destroy(fire);
-        foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Bomb")) Destroy(fire);
-        foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Bonus")) Destroy(fire);
-
-        for (int r = 0; r < rowNum; r++)
-        {
-            for (int c = 0; c < colNum; c++)
-            {
-                mapCellsLayer[r][c].Erase(force:true);
-                mapCellsLayer[r][c].erasable = true;
-                mapCellsLayer[r][c].bonusType = Cell.BonusType.none;
-            }
-        }
-    }
 }
 

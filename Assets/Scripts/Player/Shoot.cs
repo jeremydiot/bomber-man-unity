@@ -37,24 +37,24 @@ public class Shoot : MonoBehaviour
         
         if (Input.GetKey(keyboard[4]) && timers.Count < player.maxBomb)
         {
-            int playerPosX = (int)Mathf.Round(transform.position.x);
-            int playerPoxY = (int)Mathf.Round(transform.position.y);
+            int playerPosX = Mathf.RoundToInt(transform.position.x);
+            int playerPoxY = Mathf.RoundToInt(transform.position.y);
             
             if (currentBomb == null)
             {
                 timers.Add(0f);
-                currentBomb = Instantiate(bombGameObject, new Vector3(playerPosX, playerPoxY), transform.rotation);
+                currentBomb = Instantiate(bombGameObject, new Vector3(playerPosX, playerPoxY), bombGameObject.transform.rotation);
                 currentBomb.GetComponent<Bomb>().player = player;
             }
             else
             {
-                int currentBombPosX = (int)currentBomb.transform.position.x;
-                int currentBombPosY = (int)currentBomb.transform.position.y;
+                int currentBombPosX = Mathf.RoundToInt(currentBomb.transform.position.x);
+                int currentBombPosY = Mathf.RoundToInt(currentBomb.transform.position.y);
 
                 if(playerPosX != currentBombPosX || playerPoxY != currentBombPosY)
                 {
                     timers.Add(0f);
-                    currentBomb = Instantiate(bombGameObject, new Vector3(playerPosX, playerPoxY), transform.rotation);
+                    currentBomb = Instantiate(bombGameObject, new Vector3(playerPosX, playerPoxY), bombGameObject.transform.rotation);
                     currentBomb.GetComponent<Bomb>().player = player;
                 }
             }

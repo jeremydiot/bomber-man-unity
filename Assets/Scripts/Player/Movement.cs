@@ -31,8 +31,7 @@ public class Movement : MonoBehaviour
         if (Input.GetKey(keyboard[0]) && Input.GetKey(keyboard[2])) y = 0;
         if (Input.GetKey(keyboard[1]) && Input.GetKey(keyboard[3])) x = 0;
         
-    
-
+        
         transform.Translate(new Vector3(x, y) * speed * Time.deltaTime);
     }
 }
