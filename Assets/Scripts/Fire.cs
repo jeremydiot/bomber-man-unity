@@ -18,6 +18,7 @@ public class Fire : MonoBehaviour
         int posX = (int)gameObject.transform.position.x;
         int posY = (int)gameObject.transform.position.y;
 
+        // if not bonus erase cell gameObject on destroy
         if(GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject() != null)
         {
             if (!GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject().CompareTag("Bonus"))

@@ -3,11 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/**
+ * Manage game time
+ */
 public class TimeOver : MonoBehaviour
 {
 
     public GameObject UnbreakableWallPrefab;
     
+    // End time animation points
     int[][] timeOverUpPoints = new int[][]
     {
         new int[]{1,0},
@@ -57,12 +61,14 @@ public class TimeOver : MonoBehaviour
 
     void Update()
     {
+        // decrement time
         if (GameManager.Instance.currentTime > 0)
         {
             GameManager.Instance.currentTime -= Time.deltaTime;
             if (GameManager.Instance.currentTime <= 0) GameManager.Instance.currentTime = 0;
         }
         
+        // init end time animation
         if (GameManager.Instance.currentTime <= 0 && !once)
         {
             once = true;
@@ -76,6 +82,9 @@ public class TimeOver : MonoBehaviour
         }
     }
 
+    /**
+     * draw unbrekable walls each seconds  
+     */
     private void drawWall()
     {
         GameManager.Instance.mapCellsLayer[posX][posY].Erase(force: true);

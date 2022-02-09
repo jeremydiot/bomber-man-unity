@@ -6,7 +6,10 @@ public class Ability : MonoBehaviour
 {
 
     public Player player;
-
+    
+    /**
+     * Detect when player drop a bonus
+     */
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Bonus"))
@@ -17,6 +20,7 @@ public class Ability : MonoBehaviour
             Cell cell = GameManager.Instance.mapCellsLayer[bonusPosX][bonusPosY];
             Cell.BonusType bonusType = cell.bonusType;
 
+            // add bonus to player
             if (bonusType == Cell.BonusType.MoreBomb)
             {
                 player.maxBomb++;

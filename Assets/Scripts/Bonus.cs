@@ -16,28 +16,23 @@ public class Bonus : MonoBehaviour
         Cell.BonusType bonusType = cell.bonusType;
 
         SpriteRenderer spriteRenderer;
-     
-        Color spriteColor;
 
         if (cell.GetInstantiateGameObject().tag == "Bonus")
         {
             if (bonusType == Cell.BonusType.MoreBomb)
             {
-                spriteColor = Color.black;
                 spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-                spriteRenderer.color = spriteColor;
+                spriteRenderer.color = Color.black;
             }
             else if (bonusType == Cell.BonusType.MoreDistance)
             {
-                spriteColor = Color.red;
                 spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-                spriteRenderer.color = spriteColor;
+                spriteRenderer.color = Color.red;
             }
             else if (bonusType == Cell.BonusType.InfiniteDistance)
             {
-                spriteColor = Color.yellow;
                 spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-                spriteRenderer.color = spriteColor;
+                spriteRenderer.color = Color.yellow;
             }
         }
     }

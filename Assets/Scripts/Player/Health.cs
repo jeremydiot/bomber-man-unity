@@ -13,6 +13,7 @@ public class Health : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // end round when one player dead
         if (player.health <= 0 && !once)
         {
             once = true;
@@ -22,6 +23,7 @@ public class Health : MonoBehaviour
         int posX = Mathf.RoundToInt(transform.position.x);
         int posY = Mathf.RoundToInt(transform.position.y);
         
+        // kill player when is lock between two unbreakable walls
         if (GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject() != null)
         {
             if (GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject().CompareTag("UnbreakableWall"))
@@ -31,6 +33,9 @@ public class Health : MonoBehaviour
         }
     }
 
+    /**
+     * down player health when is burned
+     */
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Fire"))

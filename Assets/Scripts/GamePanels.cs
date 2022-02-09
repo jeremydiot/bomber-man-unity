@@ -5,6 +5,9 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.SceneManagement;
 
+/**
+ * Manage game panels
+ */
 public class GamePanels : MonoBehaviour
 {
     
@@ -64,6 +67,7 @@ public class GamePanels : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // open menu
         if (Input.GetKey("escape") && !MenuPanel.activeSelf && !once)
         {
             once = true;
@@ -77,7 +81,9 @@ public class GamePanels : MonoBehaviour
             });
             
             
-        }else if(Input.GetKey("escape") && MenuPanel.activeSelf && !once)
+        }
+        // close menu
+        else if(Input.GetKey("escape") && MenuPanel.activeSelf && !once)
         {
             once = true;
             MenuPanel.SetActive(false);
@@ -128,12 +134,18 @@ public class GamePanels : MonoBehaviour
         }
     }
 
+    /**
+     * Finish message
+     */
     public void Finish(string text)
     {
         FinishPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = text;
         FinishPanel.SetActive(true);
     }
     
+    /**
+     * Game message
+     */
     public void Message(string text = "" , bool status = true)
     {
         InfoPanel.SetActive(status);

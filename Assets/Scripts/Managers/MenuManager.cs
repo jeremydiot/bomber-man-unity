@@ -12,18 +12,12 @@ public class MenuManager : MonoBehaviour
 
     public GameObject TMPRoundNum;
     public GameObject TMPTimeNum;
-
-
-    public 
-
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
+    
 
     // Update is called once per frame
     void Update()
     {
+        // display chronometer
         if (maxTimeNum == 0)
         {
             TMPTimeNum.GetComponent<TextMeshProUGUI>().text = "inf";
@@ -33,6 +27,7 @@ public class MenuManager : MonoBehaviour
             TMPTimeNum.GetComponent<TextMeshProUGUI>().text = maxTimeNum.ToString();
         }
 
+        // display round num
         if (maxRoundNum == 0)
         {
             TMPRoundNum.GetComponent<TextMeshProUGUI>().text = "inf";
@@ -43,32 +38,50 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-
+    /**
+     * Up max round number action
+     */
     public void upRoundNum()
     {
         if (maxRoundNum < 99) maxRoundNum++;
     }
+    
+    /**
+     * Down max round number action
+     */
     public void downRoundNum()
     {
         if (maxRoundNum > 0) maxRoundNum--;
     }
 
+    /**
+     * Up max time action
+     */
     public void upTimeNum()
     {
         if(maxTimeNum < 240) maxTimeNum++; // max 4 minutes
     }
+    
+    /**
+     * Up max time action
+     */
     public void downTimeNum()
     {
         if(maxTimeNum > 0) maxTimeNum--;
     }
 
-
+    /**
+     * Load game scene
+     */
     public void startGame(){
         GameManager.MaxRoundNum = maxRoundNum;
         GameManager.MaxTimeNum = maxTimeNum;
         SceneManager.LoadScene(1);
     }
 
+    /**
+     * Exit application
+     */
     public void quitButton()
     {
         Application.Quit();

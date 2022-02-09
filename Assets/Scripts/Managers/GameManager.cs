@@ -230,13 +230,15 @@ public class GameManager : MonoBehaviour
     public void EndRound(Player deadPlayer)
     {
         LockGame();
-
+        
+        // end stats
         Player winPlayer = deadPlayer.GetEnemy();
         winPlayer.winNum++;
         if (deadPlayer.winNum > winPlayer.winNum) winPlayer = deadPlayer;
         
         bool equality = deadPlayer.winNum == deadPlayer.GetEnemy().winNum;
 
+        // max round or player win => end game
         if ((currentRoundNum >= MaxRoundNum || (winPlayer.winNum > MaxRoundNum/2) && MaxRoundNum > 0))
         {
             currentTime = MaxTimeNum;
@@ -246,6 +248,7 @@ public class GameManager : MonoBehaviour
             
             StartCoroutine(EndGame());
         }
+        // new round
         else
         {
             currentRoundNum++;
@@ -297,15 +300,15 @@ public class GameManager : MonoBehaviour
         panels.Message("", false);
         UnlockGame();
     }
-
+    
     private void OnEnable()
     {
-        UnlockGame();
+        UnlockGame(); // unfreeze game when gameManager is enabled
     }
 
     private void OnDisable()
     {
-        LockGame();
+        LockGame(); // freeze game when gameManager is disabled
     }
     
 

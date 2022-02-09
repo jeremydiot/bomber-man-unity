@@ -22,6 +22,7 @@ public class Shoot : MonoBehaviour
     {
         player.availableBomb = player.maxBomb - timers.Count;
 
+        // count available bombs
         for (int i = 0; i < timers.Count; i++)
         {
             timers[i] += Time.deltaTime;
@@ -35,12 +36,13 @@ public class Shoot : MonoBehaviour
             }
         }
         
+        
         if (Input.GetKey(keyboard[4]) && timers.Count < player.maxBomb)
         {
             int playerPosX = Mathf.RoundToInt(transform.position.x);
             int playerPoxY = Mathf.RoundToInt(transform.position.y);
             
-            if (currentBomb == null)
+            if (currentBomb == null) // if there is not bomb
             {
                 timers.Add(0f);
                 currentBomb = Instantiate(bombGameObject, new Vector3(playerPosX, playerPoxY), bombGameObject.transform.rotation);
@@ -51,7 +53,7 @@ public class Shoot : MonoBehaviour
                 int currentBombPosX = Mathf.RoundToInt(currentBomb.transform.position.x);
                 int currentBombPosY = Mathf.RoundToInt(currentBomb.transform.position.y);
 
-                if(playerPosX != currentBombPosX || playerPoxY != currentBombPosY)
+                if(playerPosX != currentBombPosX || playerPoxY != currentBombPosY) // if last bomb is not at the same position
                 {
                     timers.Add(0f);
                     currentBomb = Instantiate(bombGameObject, new Vector3(playerPosX, playerPoxY), bombGameObject.transform.rotation);

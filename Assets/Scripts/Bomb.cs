@@ -36,6 +36,7 @@ public class Bomb : MonoBehaviour
         int maxY = GameManager.YLength -1;
         int maxX = GameManager.XLength -1;
 
+        // instantiate fire on each directions  
         for (int i = 1; i <= player.maxDistance || player.IsInfiniteDistance(); i++)
         {
 
