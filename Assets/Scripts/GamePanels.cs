@@ -33,6 +33,7 @@ public class GamePanels : MonoBehaviour
     private TextMeshProUGUI TMPPlayerOneNumber;
 
     private bool once = false;
+    private bool canPause = false;
     
     // Start is called before the first frame update
     void Awake()
@@ -68,11 +69,12 @@ public class GamePanels : MonoBehaviour
     void Update()
     {
         // open menu
-        if (Input.GetKey("escape") && !MenuPanel.activeSelf && !once)
+        if (Input.GetKey("escape") && !MenuPanel.activeSelf && !once && canPause)
         {
             once = true;
             MenuPanel.SetActive(true);
-            
+
+            Time.timeScale = 0;
             GameManager.Instance.enabled = false;
 
             Task.Delay(250).ContinueWith(t =>
@@ -139,6 +141,7 @@ public class GamePanels : MonoBehaviour
      */
     public void Finish(string text)
     {
+        canPause = false;
         FinishPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = text;
         FinishPanel.SetActive(true);
     }
@@ -148,6 +151,7 @@ public class GamePanels : MonoBehaviour
      */
     public void Message(string text = "" , bool status = true)
     {
+        canPause = !status;
         InfoPanel.SetActive(status);
         InfoPanel.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = text;
     }
@@ -156,6 +160,7 @@ public class GamePanels : MonoBehaviour
     {
         GameManager.Instance.enabled = true;
         MenuPanel.SetActive(false);
+        Time.timeScale = 1;
     }
 
     public void quitGameBtn()
