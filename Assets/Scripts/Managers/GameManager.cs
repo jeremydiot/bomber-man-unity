@@ -210,7 +210,7 @@ public class GameManager : MonoBehaviour
      */
     public void LockGame()
     {
-        gameObject.GetComponent<TimeOver>().enabled = false;
+        if(!infiniteTime)gameObject.GetComponent<TimeOver>().enabled = false;
         players[0].Freeze();
         players[1].Freeze();
     }
@@ -220,7 +220,7 @@ public class GameManager : MonoBehaviour
      */
     public void UnlockGame()
     {
-        gameObject.GetComponent<TimeOver>().enabled = true;
+        if(!infiniteTime)gameObject.GetComponent<TimeOver>().enabled = true;
         players[0].Unfreeze();
         players[1].Unfreeze();
     }
