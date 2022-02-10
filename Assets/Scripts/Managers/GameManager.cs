@@ -188,11 +188,8 @@ public class GameManager : MonoBehaviour
      * Function to reset all cells and destroy all gameplay objects
      */
     private void CleanGame(){
-
-        foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Fire")) Destroy(fire);
-        foreach (GameObject bomb in GameObject.FindGameObjectsWithTag("Bomb")) Destroy(bomb);
-        foreach (GameObject bonus in GameObject.FindGameObjectsWithTag("Bonus")) Destroy(bonus);
-        
+        // Destroy all gameplay objects for security
+        DestroyAllGameObjects();
         // Reset each cells
         ForEachCells((x, y, cell) =>
         {
@@ -230,7 +227,7 @@ public class GameManager : MonoBehaviour
     public void EndRound(Player deadPlayer)
     {
         LockGame();
-        
+        DestroyAllGameObjects();
         // end stats
         Player winPlayer = deadPlayer.GetEnemy();
         winPlayer.winNum++;
@@ -311,6 +308,14 @@ public class GameManager : MonoBehaviour
         LockGame(); // freeze game when gameManager is disabled
     }
     
+    /*
+     * Function to destroy all gameObjects fire bomb and bonus
+     */
+    private void DestroyAllGameObjects() {
+      foreach (GameObject fire in GameObject.FindGameObjectsWithTag("Fire")) Destroy(fire);
+      foreach (GameObject bomb in GameObject.FindGameObjectsWithTag("Bomb")) Destroy(bomb);
+      foreach (GameObject bonus in GameObject.FindGameObjectsWithTag("Bonus")) Destroy(bonus);
+    }
 
 }
 
