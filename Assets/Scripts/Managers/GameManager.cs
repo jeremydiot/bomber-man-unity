@@ -197,7 +197,7 @@ public class GameManager : MonoBehaviour
         ForEachCells((x, y, cell) =>
         {
             cell.isErasable = true;
-            cell.Erase();
+            cell.Erase(force:true);
             cell.bonusType = Cell.BonusType.None;
             
             return null;

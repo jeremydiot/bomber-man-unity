@@ -74,6 +74,7 @@ public class Player
         this.availableBomb = 1;
         this.maxDistance = 1;
         this.health = 1;
+        this.countInfiniteDistance = 0;
         
         // instantiate and init player gameObject
         this.instantiateGameObject = MonoBehaviour.Instantiate(playerGameObjectPrefab, new Vector3(posX, posY), playerGameObjectPrefab.transform.rotation);
@@ -89,7 +90,10 @@ public class Player
     public void StartInfiniteDistance(int delay = 10000)
     {
         this.countInfiniteDistance ++;
-        Task.Delay(10000).ContinueWith(t => { this.countInfiniteDistance--;});
+        Task.Delay(10000).ContinueWith(t =>
+        {
+            if(this.countInfiniteDistance > 0) this.countInfiniteDistance--;
+        });
     }
 
     /*
