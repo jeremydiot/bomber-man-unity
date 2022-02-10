@@ -14,12 +14,19 @@ public class Bomb : MonoBehaviour
         Destroy(gameObject, timerDestroy);
     }
 
+    private void OnTriggerStay2D(Collider2D other)
+    {
+        if (other.gameObject.CompareTag("Fire"))
+        {
+            Destroy(gameObject);
+        }
+    }
     private void OnDestroy()
     {
         int posX = Mathf.RoundToInt(transform.position.x);
         int posY = Mathf.RoundToInt(transform.position.y);
         
-        if (player.maxDistance <= 0) return;
+        if (player.maxDistance <= 0) return;    
 
         Instantiate(fireGameObject, new Vector3(posX, posY), transform.rotation);
 
