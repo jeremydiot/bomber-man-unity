@@ -41,7 +41,6 @@ public class Shoot : MonoBehaviour
         {
             int playerPosX = Mathf.RoundToInt(transform.position.x);
             int playerPoxY = Mathf.RoundToInt(transform.position.y);
-            
             if (currentBomb == null) // if there is not bomb
             {
                 timers.Add(0f);
@@ -52,7 +51,6 @@ public class Shoot : MonoBehaviour
             {
                 int currentBombPosX = Mathf.RoundToInt(currentBomb.transform.position.x);
                 int currentBombPosY = Mathf.RoundToInt(currentBomb.transform.position.y);
-
                 if(playerPosX != currentBombPosX || playerPoxY != currentBombPosY) // if last bomb is not at the same position
                 {
                     timers.Add(0f);

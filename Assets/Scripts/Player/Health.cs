@@ -18,7 +18,6 @@ public class Health : MonoBehaviour
         {
             // change the color when the player is dead
             ChangePlayerColor(Color.yellow);
-            
             once = true;
             GameManager.Instance.EndRound(player);
         }
