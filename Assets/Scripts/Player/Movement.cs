@@ -32,4 +32,10 @@ public class Movement : MonoBehaviour
         
         transform.Translate(new Vector3(x, y) * speed * Time.deltaTime);
     }
+
+    private void OnTriggerExit2D(Collider2D other) {
+        if (other.gameObject.tag == "Bomb") {
+          other.gameObject.GetComponent<CircleCollider2D>().isTrigger = false;
+        }
+    }
 }
