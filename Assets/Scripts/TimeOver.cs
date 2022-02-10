@@ -59,6 +59,11 @@ public class TimeOver : MonoBehaviour
 
     private bool once = false;
 
+    private void Start()
+    {
+        enabled = !GameManager.Instance.infiniteTime;
+    }
+
     void Update()
     {
         // decrement time

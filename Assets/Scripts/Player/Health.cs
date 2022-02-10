@@ -30,7 +30,15 @@ public class Health : MonoBehaviour
         {
             if (GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject().CompareTag("UnbreakableWall"))
             {
-                player.health = 0;    
+                inWallTimer += Time.deltaTime;
+                if (inWallTimer >= 0.1)
+                {
+                    player.health = 0;    
+                }   
+            }
+            else
+            {
+                inWallTimer = 0;
             }
         }
     }

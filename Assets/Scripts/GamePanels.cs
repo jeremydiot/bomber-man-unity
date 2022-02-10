@@ -96,8 +96,16 @@ public class GamePanels : MonoBehaviour
                 once = false;
             });
         }
+
+        if (GameManager.Instance.infiniteTime)
+        {
+            TMPTimeNum.text = "inf";
+        }
+        else
+        {
+            TMPTimeNum.text = ((int)GameManager.Instance.currentTime).ToString();    
+        }
         
-        TMPTimeNum.text = ((int)GameManager.Instance.currentTime).ToString();
 
         if (GameManager.MaxRoundNum < 1) TMPRoundNum.text = GameManager.Instance.currentRoundNum.ToString()+" / inf";
         else TMPRoundNum.text = GameManager.Instance.currentRoundNum.ToString()+" / "+GameManager.MaxRoundNum.ToString();
@@ -165,6 +173,7 @@ public class GamePanels : MonoBehaviour
 
     public void quitGameBtn()
     {
+        Time.timeScale = 1;
         SceneManager.LoadScene(0);
     }
 }

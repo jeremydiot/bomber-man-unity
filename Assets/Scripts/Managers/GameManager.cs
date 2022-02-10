@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
     public static readonly int XLength = ColNum;
     public static readonly int YLength = RowNum;
     
-    // Max number for each in game
+    // Max number for each element
     private static readonly int BreakableWallNum = 40;
     private static readonly int InfiniteDistanceBonusNum = 6;
     private static readonly int MoreBombBonus = 6;   
@@ -77,6 +77,7 @@ public class GameManager : MonoBehaviour
     public int currentRoundNum = 1;
     public float currentTime = MaxTimeNum;
     private string finishMessage;
+    public bool infiniteTime = false;
 
     // Function to browse all game cell
     private void ForEachCells(Func<int,int,Cell,Cell> callback)
@@ -95,7 +96,10 @@ public class GameManager : MonoBehaviour
         }
     }
     
-    private void Awake(){
+    private void Awake()
+    {
+        if (MaxTimeNum <= 0) infiniteTime = true;
+        
         Instance = this;
         panels = gameObject.GetComponent<GamePanels>();
 
