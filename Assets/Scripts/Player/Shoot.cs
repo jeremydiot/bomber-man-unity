@@ -37,7 +37,7 @@ public class Shoot : MonoBehaviour
         }
         
         
-        if (Input.GetKey(keyboard[4]) && timers.Count < player.maxBomb)
+        if (Input.GetKeyDown(keyboard[4]) && timers.Count < player.maxBomb)
         {
             int playerPosX = Mathf.RoundToInt(transform.position.x);
             int playerPoxY = Mathf.RoundToInt(transform.position.y);
