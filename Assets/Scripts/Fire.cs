@@ -17,18 +17,22 @@ public class Fire : MonoBehaviour
     {
         int posX = (int)gameObject.transform.position.x;
         int posY = (int)gameObject.transform.position.y;
-
         // if not bonus erase cell gameObject on destroy
         if(GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject() != null)
         {
-            if (!GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject().CompareTag("Bonus"))
+            //si c'est un bonus existant
+            if (GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject().CompareTag("Bonus"))
             {
-                GameManager.Instance.mapCellsLayer[posX][posY].Erase();
+              GameManager.Instance.mapCellsLayer[posX][posY].Erase();
+            } 
+            else
+            {
+              GameManager.Instance.mapCellsLayer[posX][posY].Erase();
 
-                if ((GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject() == null) && GameManager.Instance.mapCellsLayer[posX][posY].bonusType != Cell.BonusType.None)
-                {
-                    GameManager.Instance.mapCellsLayer[posX][posY].Draw(bonusPrefab);
-                }
+              if ((GameManager.Instance.mapCellsLayer[posX][posY].GetInstantiateGameObject() == null) && GameManager.Instance.mapCellsLayer[posX][posY].bonusType != Cell.BonusType.None)
+              {
+                  GameManager.Instance.mapCellsLayer[posX][posY].Draw(bonusPrefab);
+              }
             }
         }
     }
