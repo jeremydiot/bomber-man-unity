@@ -143,4 +143,15 @@ public class Player
     {
         return this.instantiateGameObject;
     }
+
+  /**
+   * Change player color
+   */
+  public void ChangePlayerColor(Color color)
+  {
+    if(this.instantiateGameObject != null)
+    {
+      this.instantiateGameObject.GetComponent<SpriteRenderer>().color = color;
+    }
+  }
 }

@@ -17,7 +17,7 @@ public class Health : MonoBehaviour
         if (player.health <= 0 && !once)
         {
             // change the color when the player is dead
-            ChangePlayerColor(Color.yellow);
+            player.ChangePlayerColor(Color.yellow);
             once = true;
             GameManager.Instance.EndRound(player);
         }
@@ -44,15 +44,5 @@ public class Health : MonoBehaviour
         {
             player.health--;
         }
-    }
-    
-    /**
-      * change player color
-      */
-    private void ChangePlayerColor(Color color) 
-    {
-        SpriteRenderer spriteRenderer;
-        spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-        spriteRenderer.color = color;
     }
 }
