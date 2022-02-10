@@ -59,7 +59,7 @@ public class MenuManager : MonoBehaviour
      */
     public void upTimeNum()
     {
-        if(maxTimeNum < 240) maxTimeNum++; // max 4 minutes
+        if(maxTimeNum < 240) maxTimeNum+=10; // max 4 minutes
     }
     
     /**
@@ -67,7 +67,7 @@ public class MenuManager : MonoBehaviour
      */
     public void downTimeNum()
     {
-        if(maxTimeNum > 0) maxTimeNum--;
+        if(maxTimeNum > 0) maxTimeNum-=10;
     }
 
     /**
